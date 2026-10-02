@@ -5,7 +5,7 @@ import * as Actions from '../actions';
 import { canFire, isAuto, readiness } from '../game';
 import { game, ui } from '../store';
 import { T } from '../tuning';
-import { emptySlot, screenUi, weapon } from './shared';
+import { screenUi, weapon } from './shared';
 import hudKdl from './hud.kdl?raw';
 import hudCss from './hud.css?raw';
 
@@ -26,12 +26,13 @@ export function drawHud() {
     pennies: `${run.points}¢`,
     score: `SCORE ${run.score}`,
   }, {
-    slots: run.mounts.map((m, i) => {
-      if (!m.weapon) return emptySlot(`slot${i}`);
+    // Empty slots stay out of the fight's way: only what's swallowed shows.
+    slots: run.mounts.flatMap((m, i) => {
+      if (!m.weapon) return [];
       const tag = `${weaponDef(m.weapon).cooldownS}s`, charge = Math.floor(readiness(m) * BAR_STEPS) / BAR_STEPS;
-      if (isAuto(i)) return weapon(m.weapon, undefined, { key: `slot${i}`, tag, charge, foot: 'AUTO' });
+      if (isAuto(i)) return [weapon(m.weapon, undefined, { key: `slot${i}`, tag, charge, foot: 'AUTO', compact: true })];
       const ready = canFire(run, i);
-      return weapon(m.weapon, () => Actions.fireWeapon(i), { key: `slot${i}`, tag, charge, foot: ready ? `READY · PRESS ${i + 1}` : `KEY ${i + 1}`, ready });
+      return [weapon(m.weapon, () => Actions.fireWeapon(i), { key: `slot${i}`, tag, charge, foot: ready ? `READY · PRESS ${i + 1}` : `KEY ${i + 1}`, ready, compact: true })];
     }),
   }));
 }

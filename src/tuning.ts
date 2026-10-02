@@ -3,7 +3,7 @@
 // cost and do, what each wave sends) lives in content/*.kdl; look numbers live in screens/shared.css.
 
 export const T = {
-  // ---------- the basement floor: a rectangle centred on the origin; nothing leaves it ----------
+  // ---------- the nightmare floor: a rectangle centred on the origin; nothing leaves it ----------
   FLOOR_W_U: 24,
   FLOOR_H_U: 14,
 

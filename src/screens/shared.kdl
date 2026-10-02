@@ -8,8 +8,8 @@ prefab "btn" {
     }
 }
 
-// A weapon from content/weapons.kdl: weapon(id, tap, { key, tag, charge, foot, off?, ready? }) in shared.ts. Its kind
-// (attack, defend), `off` and `ready` become classes; with no tap (the automatic slot) it can't be pressed.
+// A weapon from content/weapons.kdl: weapon(id, tap, { key, tag, charge, foot, off?, ready?, compact? }) in shared.ts.
+// Its kind (attack, defend), `off`, `ready` and `compact` become classes; with no tap (the automatic slot) it can't be pressed.
 prefab "weapon" {
     button class="weapon" bind-class="state" tap="tap" {
         panel class="weapon-top" {
@@ -36,7 +36,7 @@ prefab "line" {
     text class="shared-line" bind="text"
 }
 
-// A dialog over the dimmed basement: dialog(title, sub, body, buttons, layout?) in shared.ts. It swallows taps, so
+// A dialog over the dimmed nightmare: dialog(title, sub, body, buttons, layout?) in shared.ts. It swallows taps, so
 // nothing behind it can be pressed. `layout` is the body's class: a column of lines, or a `row` of tiles.
 prefab "dialog" {
     panel class="dialog" {

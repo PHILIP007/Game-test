@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from '@storybook/html-vite';
 import { expect } from 'storybook/test';
 import { WEAPONS } from '../content';
-import { newGame, sellPrice, type Enemy, type GameState, type Mount } from '../game';
+import { newGame, sellPrice, type Enemy, type GameState, type Mount, type Shot } from '../game';
 import { T } from '../tuning';
 import { advance, game, press, ready, screenText, stage, storyArgs, storyControls, type StoryArgs } from './stage';
 
@@ -21,10 +21,10 @@ const mounts = (...weapons: string[]): Mount[] => Array.from({ length: T.STOMACH
 const midFight = (): GameState => {
   const s = newGame(4);
   return {
-    ...s, wave: 3, score: 340, points: 90, kills: 21, queue: ['fly', 'fly'],
+    ...s, wave: 3, score: 340, points: 90, kills: 21, queue: ['mothling', 'mothling'],
     mounts: mounts('spit', 'chunks', 'tooth'),
     player: { ...s.player, hp: 6, aim: { x: 1, y: 0 } },
-    enemies: [foe(901, 'fly', 6, -3), foe(902, 'weeper', -7, -4), foe(903, 'squealer', 8, 4, 5), foe(904, 'glutton', -6, 4, 18)],
+    enemies: [foe(901, 'mothling', 6, -3), foe(902, 'goggler', -7, -4), foe(903, 'gnasher', 8, 4, 5), foe(904, 'sackmaw', -6, 4, 18)],
   };
 };
 /** The shop after wave 3, with `points` to spend. */
@@ -53,7 +53,7 @@ export const Fight: Story = {
   play: async ({ args }) => {
     if (!args.runInteraction) return;
     await ready();
-    await expect(screenText()).toEqual(expect.arrayContaining(['WAVE 3', '90¢', 'SPIT', 'CHUNKS', 'LOOSE TOOTH', 'NOTHING SWALLOWED']));
+    await expect(screenText()).toEqual(expect.arrayContaining(['WAVE 3', '90¢', 'SPIT', 'CHUNKS', 'LOOSE TOOTH']));
     advance(100);
     // Mount 1 fires by itself; the others wait to be called.
     let s = game.getState().run;
@@ -125,7 +125,7 @@ export const GameOver: Story = {
   play: async ({ args }) => {
     if (!args.runInteraction) return;
     await ready();
-    await expect(screenText()).toContain('THE BASEMENT GOT YOU ON WAVE 3');
+    await expect(screenText()).toContain('THE NIGHTMARE GOT YOU ON WAVE 3');
     await press('AGAIN');
     await expect(game.getState().run.wave).toBe(1);
     await expect(game.getState().run.phase).toBe('fight');
@@ -159,4 +159,45 @@ export const Shielded: Story = {
     await expect(screenText()).toEqual(expect.arrayContaining(['SPIT BUBBLE', 'LICK WOUNDS', 'PROJECTILE PUKE']));
     await expect(game.getState().run.player.hp).toBe(1); // one heart left, the bubble up
   },
+};
+
+// ---------- look stories: moments to judge the art by (no play: they only have to render) ----------
+
+const shot = (id: number, x: number, y: number, vx: number, vy: number, from: Shot['from']): Shot =>
+  ({ id, x, y, v: { x: vx, y: vy }, r: from === 'foe' ? T.FOE_SHOT_R_U : T.SHOT_R_U, damage: 1, pierce: false, hit: [], lifeS: 2, from });
+
+/** Every enemy about to attack: a gnasher winding up, a goggler and a sackmaw a moment from firing, spit in the air. */
+export const Danger: Story = {
+  render: () => stage(() => {
+    const s = midFight();
+    return {
+      run: {
+        ...s, queue: [],
+        enemies: [
+          { ...foe(901, 'gnasher', 4, 2.5, 5), mode: 'windup', modeS: 0.4 },
+          { ...foe(902, 'goggler', -5, -3), timers: { shoot: 0.1 } },
+          { ...foe(903, 'sackmaw', 6, -3.5, 18), timers: { spray: 0.1 } },
+          foe(904, 'mothling', -3, 3),
+        ],
+        shots: [shot(801, -2.5, -1.5, 5, 3, 'foe'), shot(802, 1.5, -2.2, -3, 4, 'foe'), shot(803, 1.2, 0.4, 9, 2, { weapon: 'spit' })],
+      },
+      ui: { screen: 'run' },
+    };
+  }),
+};
+
+/** A crowded wave: a ring of mothlings closing in, gnashers and a sackmaw behind, the child spitting back, two just popped. */
+export const Swarm: Story = {
+  render: () => stage(() => {
+    const s = midFight(), enemies: Enemy[] = [];
+    for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; enemies.push(foe(920 + i, 'mothling', Math.cos(a) * 5.5, Math.sin(a) * 3.6)); }
+    enemies.push(foe(940, 'gnasher', -8, 4, 5), foe(941, 'gnasher', 8.5, -4, 5), foe(942, 'sackmaw', 0, -5.2, 18), foe(943, 'goggler', -9, -3));
+    const shots = [shot(810, 2, 0.3, 9, 1, { weapon: 'chunks' }), shot(811, 2.2, -0.4, 9, -1, { weapon: 'chunks' }), shot(812, -6, 2, 4, -2, 'foe')];
+    // Two mothlings just popped (ink on the floor) and two more just got hit (mid-squish).
+    const events: GameState['events'] = [
+      { type: 'killed', id: 990, kind: 'mothling', x: 3.2, y: 1.6 }, { type: 'killed', id: 991, kind: 'mothling', x: -2.8, y: -2.4 },
+      { type: 'struck', id: 921, damage: 1 }, { type: 'struck', id: 925, damage: 1 },
+    ];
+    return { run: { ...s, wave: 6, enemies, shots, events, mounts: mounts('spit', 'chunks', 'burp', 'bubble') }, ui: { screen: 'run' } };
+  }),
 };

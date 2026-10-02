@@ -10,8 +10,8 @@ import enemiesKdl from '../content/enemies.kdl?raw';
 import wavesKdl from '../content/waves.kdl?raw';
 import weaponsKdl from '../content/weapons.kdl?raw';
 
-/** A palette token in screens/shared.css :root (`--enemy-fly`); the shell reads its colour through tokens.ts. */
-const paint = z.string().regex(/^--[\w-]+$/, 'a palette token like "--enemy-fly"');
+/** A palette token in screens/shared.css :root (`--enemy-mothling`); the shell reads its colour through tokens.ts. */
+const paint = z.string().regex(/^--[\w-]+$/, 'a palette token like "--enemy-mothling"');
 const child = z.strictObject({ name: z.string(), args: z.array(z.unknown()), props: z.strictObject({}) });
 
 // ---------- weapons ----------
@@ -59,8 +59,8 @@ export function weaponDef(id: string): WeaponDef {
 
 // ---------- enemies ----------
 
-/** The bodies an enemy can have in the basement (src/view/scene.ts builds each). */
-export const SHAPES = ['fly', 'head', 'lump', 'blob'] as const;
+/** The bodies an enemy can have in the nightmare (src/view/scene.ts builds each). */
+export const SHAPES = ['moth', 'eyeball', 'grin', 'sack'] as const;
 
 export const EnemySchema = z.strictObject({
   id: z.string(),

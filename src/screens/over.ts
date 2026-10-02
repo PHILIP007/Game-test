@@ -13,7 +13,7 @@ export function drawOver() {
   if (screen !== 'run' || run.phase !== 'dead') return overUi.show(null);
   overUi.show(dialog(
     'YOU CHOKED',
-    `THE BASEMENT GOT YOU ON WAVE ${run.wave}`,
+    `THE NIGHTMARE GOT YOU ON WAVE ${run.wave}`,
     [line(`SCORE ${run.score}  ·  ${run.kills} THINGS POPPED`), line(`BEST ${meta.best}  ·  FURTHEST WAVE ${meta.bestWave}`)],
     [btn('AGAIN', () => Actions.start(), 'primary'), btn('TITLE', () => Actions.toTitle())],
   ));

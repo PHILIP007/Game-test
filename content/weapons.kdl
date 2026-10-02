@@ -1,6 +1,6 @@
 // What comes out of the kid's mouth. The kid can have up to 4 things swallowed (STOMACH_SLOTS in src/tuning.ts),
 // each on its own cooldown. Whatever sits in slot 1 (AUTO_SLOTS) spits at the cursor by itself whenever its cooldown
-// comes round, holding back while the basement is empty; the others wait, ready, until you call them (press 2, 3 or
+// comes round, holding back while the nightmare is empty; the others wait, ready, until you call them (press 2, 3 or
 // 4, or click the tile). Whatever you swallow goes in the first empty slot, so cough up the spit and your next
 // swallow becomes the automatic one. The shop after each wave offers 3 of these with a price in pennies; coughing
 // one up pays back half its price (SELL_BACK).

@@ -34,7 +34,7 @@ describe('the fight', () => {
     expect(Math.abs(e.x) > T.FLOOR_W_U / 2 - 1 || Math.abs(e.y) > T.FLOOR_H_U / 2 - 1).toBe(true);
   });
   it('the thing in slot 1 fires at the cursor by itself, then waits out its cooldown', () => {
-    let s = arena([foe('fly', -8, 6)]);
+    let s = arena([foe('mothling', -8, 6)]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
     expect(s.shots).toHaveLength(1);
     expect(s.shots[0]!.v.y).toBeGreaterThan(0);
@@ -43,7 +43,7 @@ describe('the fight', () => {
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
     expect(s.shots).toHaveLength(1);
   });
-  const armed = () => arena([foe('fly', -8, 6)], { mounts: [{ weapon: 'spit', cooldownS: 0 }, { weapon: 'tooth', cooldownS: 0 }, { weapon: 'chunks', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
+  const armed = () => arena([foe('mothling', -8, 6)], { mounts: [{ weapon: 'spit', cooldownS: 0 }, { weapon: 'tooth', cooldownS: 0 }, { weapon: 'chunks', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
   it('the other slots never fire by themselves: they wait, ready, to be called', () => {
     const s = run(armed(), 2, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.shots.some((b) => b.from !== 'foe' && b.from.weapon !== 'spit')).toBe(false);
@@ -60,7 +60,7 @@ describe('the fight', () => {
     expect(fireWeapon(s, 3)).toBe(s); // an empty slot
   });
   it('a called thing can be fired into an empty basement (it\'s your call); the automatic one holds its fire', () => {
-    const s = step(arena([], { queue: ['fly'] , spawnS: 9 , mounts: [{ weapon: 'spit', cooldownS: 0 }, { weapon: 'burp', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] }), STEP_S, IDLE);
+    const s = step(arena([], { queue: ['mothling'] , spawnS: 9 , mounts: [{ weapon: 'spit', cooldownS: 0 }, { weapon: 'burp', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] }), STEP_S, IDLE);
     expect(s.events.some((e) => e.type === 'fired')).toBe(false);
     expect(fireWeapon(s, 1).shots.length).toBeGreaterThan(0);
   });
@@ -68,34 +68,34 @@ describe('the fight', () => {
     const s = run(newGame(1), 10, { move: { x: 1, y: 0 }, aim: { x: 0, y: 0 } });
     expect(s.player.x).toBeCloseTo(T.FLOOR_W_U / 2 - T.PLAYER_R_U);
   });
-  it('a fly walks at the kid and hurts on contact, then the kid is briefly untouchable', () => {
-    let s = arena([foe('fly', 3, 0)]);
+  it('a mothling walks at the kid and hurts on contact, then the kid is briefly untouchable', () => {
+    let s = arena([foe('mothling', 3, 0)]);
     s = run(s, 1, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } }); // aim away so the spit misses
-    expect(s.player.hp).toBe(T.PLAYER_HP - ENEMIES.fly!.touch);
+    expect(s.player.hp).toBe(T.PLAYER_HP - ENEMIES.mothling!.touch);
     expect(s.player.graceS).toBeGreaterThan(0);
   });
   it('shots kill, and kills pay pennies (which count towards the score)', () => {
-    let s = arena([foe('fly', 4, 0, { hp: 1 }), foe('fly', -8, 6, { id: 901 })]);
+    let s = arena([foe('mothling', 4, 0, { hp: 1 }), foe('mothling', -8, 6, { id: 901 })]);
     s = run(s, 0.5, { move: { x: 0, y: 0 }, aim: { x: 4, y: 0 } });
     expect(s.kills).toBe(1);
     expect(s.points).toBe(10);
     expect(s.score).toBe(10);
   });
-  it('a squealer winds up, then lunges', () => {
-    let s = arena([foe('squealer', 8, 0, { timers: { lunge: 0.01 } })]);
+  it('a gnasher winds up, then lunges', () => {
+    let s = arena([foe('gnasher', 8, 0, { timers: { lunge: 0.01 } })]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.enemies[0]!.mode).toBe('windup');
     expect(s.events).toContainEqual({ type: 'windup', id: 900 });
     s = run(s, T.LUNGE_WINDUP_S + STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.enemies[0]!.mode).toBe('lunge');
   });
-  it('a weeper shoots at the kid', () => {
-    let s = arena([foe('weeper', 6, 0, { timers: { shoot: 0.01 } })]);
+  it('a goggler shoots at the kid', () => {
+    let s = arena([foe('goggler', 6, 0, { timers: { shoot: 0.01 } })]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.shots.filter((b) => b.from === 'foe')).toHaveLength(1);
   });
-  it('a glutton sprays a ring', () => {
-    let s = arena([foe('glutton', 6, 0, { timers: { spray: 0.01 } })]);
+  it('a sackmaw sprays a ring', () => {
+    let s = arena([foe('sackmaw', 6, 0, { timers: { spray: 0.01 } })]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.shots.filter((b) => b.from === 'foe').length).toBeGreaterThan(5);
   });
@@ -104,7 +104,7 @@ describe('the fight', () => {
     expect(cleared.phase).toBe('shop');
     expect(cleared.offer).toHaveLength(T.OFFER_SIZE);
     expect(cleared.offer.every((w) => WEAPONS[w]!.price > 0)).toBe(true);
-    const dead = step(arena([foe('fly', 0.2, 0)], { player: { ...newGame(1).player, hp: 1 } }), STEP_S, IDLE);
+    const dead = step(arena([foe('mothling', 0.2, 0)], { player: { ...newGame(1).player, hp: 1 } }), STEP_S, IDLE);
     expect(dead.phase).toBe('dead');
     expect(dead.events.at(-1)).toEqual({ type: 'died' });
     expect(step(dead, STEP_S, IDLE)).toBe(dead);

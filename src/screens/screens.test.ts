@@ -31,7 +31,8 @@ describe('screens render from the stores', () => {
   it('hud: wave, pennies, score, the slots', () => {
     const s = { ...newGame(1), points: 70, score: 120 };
     const t = show(s, { screen: 'run' });
-    expect(t).toEqual(expect.arrayContaining(['WAVE 1', '70¢', 'SCORE 120', 'SPIT', 'A gob of spit at the cursor', 'NOTHING SWALLOWED']));
+    expect(t).toEqual(expect.arrayContaining(['WAVE 1', '70¢', 'SCORE 120', 'SPIT']));
+    expect(t).not.toContain('NOTHING SWALLOWED'); // the HUD shows only what's swallowed
     expect(t).not.toContain('GOB');
   });
   it('shop: offers with prices, slots to sell, move on', () => {
@@ -40,7 +41,7 @@ describe('screens render from the stores', () => {
     expect(texts()).not.toContain('HULL'); // the HUD steps aside for the shop
   });
   it('game over', () => {
-    expect(show({ ...newGame(1), phase: 'dead', wave: 5 }, { screen: 'run' })).toContain('THE BASEMENT GOT YOU ON WAVE 5');
+    expect(show({ ...newGame(1), phase: 'dead', wave: 5 }, { screen: 'run' })).toContain('THE NIGHTMARE GOT YOU ON WAVE 5');
   });
   it('pause', () => {
     expect(show(newGame(1), { screen: 'run', paused: true })).toEqual(expect.arrayContaining(['PAUSED', 'RESUME', 'QUIT']));

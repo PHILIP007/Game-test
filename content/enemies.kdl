@@ -1,10 +1,11 @@
-// The things in the basement.
-//   enemy "id" name="Shown name" hp=<health> r=<radius, u> touch=<hearts lost on contact> paint="--token" shape="fly|head|lump|blob" {
+// The things in the nightmare: black paper shadows with big pale eyes.
+//   enemy "id" name="Shown name" hp=<health> r=<radius, u> touch=<hearts lost on contact> paint="--token" shape="moth|eyeball|grin|sack" {
 //       enemy words, one per line: how it moves and attacks, then what it drops when killed
 //   }
-// `paint` is a palette token in src/screens/shared.css :root; `shape` is its body (src/view/scene.ts).
+// `paint` is a palette token in src/screens/shared.css :root (a near-black: only danger gets colour); `shape` is its
+// body (src/view/scene.ts).
 // Enemy words (src/enemies.ts, catalog ## Behaviour words); speeds in u/s, the kid runs at 7:
-//   chase speed                   go straight for the kid
+//   chase speed                   go straight for the child
 //   orbit range_u speed           keep about range_u away and circle
 //   lunge every_s speed           every few seconds: stop, shake, then charge at the kid
 //   shoot every_s speed           every few seconds: one shot at the kid
@@ -13,28 +14,28 @@
 //   pennies n                     n pennies to spend in the shop (and n towards the run's score)
 //   heal n                        n hearts back
 
-// Fast, fragile, comes in swarms. Buzz.
-enemy "fly" name="Fly" hp=2 r=0.4 touch=1 paint="--enemy-fly" shape="fly" {
+// A fat, fuzzy moth-thing that's all eyes. Fast, fragile, comes in swarms.
+enemy "mothling" name="Mothling" hp=2 r=0.4 touch=1 paint="--enemy-mothling" shape="moth" {
     chase 3.6
     pennies 10
 }
 
-// A floating head that cries blood at you from a distance. Get close, or knock a tooth through it.
-enemy "weeper" name="Weeper" hp=3 r=0.45 touch=1 paint="--enemy-weeper" shape="head" {
+// One enormous eye on stubby feet. It circles at a distance and spits; get close, or knock a tooth through it.
+enemy "goggler" name="Goggler" hp=3 r=0.45 touch=1 paint="--enemy-goggler" shape="eyeball" {
     orbit 7 2.0
     shoot 2.6 7
     pennies 20
 }
 
-// A pink lump that waddles, then stops and squeals: that's your cue to move before it charges.
-enemy "squealer" name="Squealer" hp=5 r=0.55 touch=2 paint="--enemy-squealer" shape="lump" {
+// A squat lump that's mostly grin. It waddles, then swells up: that's your cue to move before it charges.
+enemy "gnasher" name="Gnasher" hp=5 r=0.55 touch=2 paint="--enemy-gnasher" shape="grin" {
     chase 1.6
     lunge 3.2 15
     pennies 30
 }
 
-// Slow and enormous; heaves rings of bile. Worth everything in your stomach.
-enemy "glutton" name="Glutton" hp=18 r=0.95 touch=2 paint="--enemy-glutton" shape="blob" {
+// A huge sewn-up sack crowded with eyes. Slow; heaves rings of spit. Worth everything in your stomach.
+enemy "sackmaw" name="Sackmaw" hp=18 r=0.95 touch=2 paint="--enemy-sackmaw" shape="sack" {
     chase 1.1
     spray 10 3.5 5
     pennies 80

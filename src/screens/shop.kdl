@@ -1,4 +1,4 @@
-// The shop after a cleared wave, over the dimmed basement: the title and your pennies; what's on offer, one thing to
+// The shop after a cleared wave, over the dimmed nightmare: the title and your pennies; what's on offer, one thing to
 // swallow (that starts the next wave); your stomach, anything in which you can cough up first to free a slot or for
 // pennies; and a button to move on without buying. Styled with the shared dialog classes (shared.css) and shop.css; bound in shop.ts.
 prefab "shop" {

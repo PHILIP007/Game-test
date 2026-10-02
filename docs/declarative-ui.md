@@ -107,97 +107,158 @@ Build them with the binding builders exported from `screens/shared.ts`.
 | Prefab | Use |
 |---|---|
 | `btn` | `btn(label, tap, state?)`; state `primary` / `off` |
-| `weapon` | `weapon(id, tap, { key, tag, charge, foot, off?, ready? })`: a weapon tile from `content/weapons.kdl`; `charge` fills its cooldown bar; its kind, `off` and `ready` are classes; no tap (the automatic slot), not pressable |
-| `slot-empty` | `emptySlot(key)`: an empty stomach slot, the size of a weapon tile |
+| `weapon` | `weapon(id, tap, { key, tag, charge, foot, off?, ready?, compact? })`: a weapon tile from `content/weapons.kdl`; `charge` fills its cooldown bar; its kind, `off`, `ready` and `compact` (the HUD: no description) are classes; no tap (the automatic slot), not pressable |
+| `slot-empty` | `emptySlot(key)`: an empty stomach slot, the size of a weapon tile (the shop; the HUD shows only what's swallowed) |
 | `line` | `line(text)`: a line of text in a dialog's body |
 | `dialog` | `dialog(title, sub, body, buttons, layout?)`: over the dimmed basement, swallows taps; `layout` `column` (lines) or `row` (tiles) |
 
 ## Palette
 
-UI colours, the basement's colours, one `--weapon-<id>` per weapon and one `--enemy-<id>` per enemy (a guard test
-checks every `paint=` is here and named after its weapon or enemy).
+The world is greyscale; the only colours are the two accents, warm (the child and anything theirs) and danger red
+(attacks and the tells before them). One `--weapon-<id>` per weapon and one `--enemy-<id>` per enemy (a guard test
+checks every `paint=` is here and named after its weapon or enemy). Each row quotes the comment above it in
+`shared.css`, where the tokens are grouped.
 
 | Token | Use |
 |---|---|
-| `--ink` | the darkest background, the basement's clear colour and bounce light, a cooldown bar's track |
-| `--panel` | button, tile and bar fill |
-| `--panel-ready` | a called slot's tile when it can be used |
-| `--edge` | button and empty-slot border |
-| `--text` | body text |
-| `--dim` | secondary text |
-| `--accent` | primary UI accent: primary buttons, hover, the wave, dialog titles, the title |
-| `--scrim` | the dark behind a dialog and the title |
-| `--heart` | the hearts |
-| `--penny` | pennies: the HUD's count, the shop's, prices |
-| `--pop` | overshoot easing |
-| `--title-font` | headings, numbers and button labels (Gochi Hand, bundled in `src/fonts`) |
-| `--body-font` | body text |
-| `--kind-attack` | an attack's tile frame and cooldown bar |
-| `--kind-defend` | a defence's tile frame and cooldown bar |
-| `--floor` | the basement floor |
-| `--grid` | the seams between floor tiles |
-| `--wall` | the walls |
-| `--light` | the bulb's hue (key and bounce light) |
-| `--vignette` | the dark round the screen's edges |
-| `--kid-skin` | the kid's skin, and their burst when they die |
-| `--kid-eye` | the kid's eyes |
-| `--kid-mouth` | the kid's mouth |
-| `--bubble` | the spit bubble round the kid |
-| `--reticle` | the aim ring under the cursor |
-| `--eye` | every enemy's eyes |
-| `--mouth` | every enemy's mouth |
-| `--enemy-spit` | what enemies spit back, the weeper's tears, the blood in the gore |
-| `--weapon-spit` | spit |
-| `--weapon-slobber` | slobber |
-| `--weapon-chunks` | chunks |
-| `--weapon-tooth` | the loose tooth |
-| `--weapon-raspberry` | the raspberry |
-| `--weapon-burp` | the big burp's ring |
-| `--weapon-puke` | projectile puke |
-| `--weapon-bubble` | the spit bubble (defence) |
-| `--weapon-lick` | lick wounds (defence) |
-| `--enemy-fly` | the fly, and its gore |
-| `--enemy-weeper` | the weeper |
-| `--enemy-squealer` | the squealer |
-| `--enemy-glutton` | the glutton |
+| `--warm` | Warm: the kid, their shots, their hearts and anything that's theirs. |
+| `--warm-core` | Warm: the kid, their shots, their hearts and anything that's theirs. |
+| `--danger` | Sickly red: enemy attacks and danger (a bulge before an attack, the pulse when you're hurt). |
+| `--danger-core` | Sickly red: enemy attacks and danger (a bulge before an attack, the pulse when you're hurt). |
+| `--danger-eye-rest` | Every creature's iris: a dark grey at rest (no colour on a creature that isn't attacking), blazing to the second colour just before it attacks, so red always means "about to hurt you". |
+| `--danger-eye` | Every creature's iris: a dark grey at rest (no colour on a creature that isn't attacking), blazing to the second colour just before it attacks, so red always means "about to hurt you". |
+| `--ink` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--panel` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--panel-ready` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--edge` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--text` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--dim` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--accent` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--scrim` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--heart` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--penny` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--pop` | ---------- UI: greyscale, so the accents stay loud ---------- |
+| `--title-font` | Gochi Hand is bundled (src/fonts/fonts.css); the others stand in only if it fails to load. |
+| `--body-font` | Gochi Hand is bundled (src/fonts/fonts.css); the others stand in only if it fails to load. |
+| `--kind-attack` | Tile frames, one per weapon kind (content/weapons.kdl `kind=`). |
+| `--kind-defend` | Tile frames, one per weapon kind (content/weapons.kdl `kind=`). |
+| `--floor-glow` | The floor: bright where the light is, black where it isn't. |
+| `--floor-dark` | The floor: bright where the light is, black where it isn't. |
+| `--beyond` | Beyond the far wall: the bright fog the light comes from (what hangs in front of it reads as silhouette). |
+| `--fog` | The fog things fade into with distance, and the haze laid over the whole frame. |
+| `--haze` | The fog things fade into with distance, and the haze laid over the whole frame. |
+| `--wall` | The walls, every body (near-black paper cutouts), the thin light on their edges, their shadows. |
+| `--silhouette` | The walls, every body (near-black paper cutouts), the thin light on their edges, their shadows. |
+| `--rim` | The walls, every body (near-black paper cutouts), the thin light on their edges, their shadows. |
+| `--shadow` | The walls, every body (near-black paper cutouts), the thin light on their edges, their shadows. |
+| `--eye` | Every creature's eyes: big and pale round an iris (--danger-eye-rest), so they read at a glance; their pupils. |
+| `--pupil` | Every creature's eyes: big and pale round an iris (--danger-eye-rest), so they read at a glance; their pupils. |
+| `--splat` | Ink: what's left on the floor when something dies. |
+| `--vignette` | The film: the dark round the edges, the blurred silhouettes in front of the lens, the grain. |
+| `--edge-silhouette` | The film: the dark round the edges, the blurred silhouettes in front of the lens, the grain. |
+| `--grain` | The film: the dark round the edges, the blurred silhouettes in front of the lens, the grain. |
+| `--reticle` | The aim ring under the cursor and the bubble round the kid: the kid's, so warm. |
+| `--bubble` | The aim ring under the cursor and the bubble round the kid: the kid's, so warm. |
+| `--weapon-spit` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-slobber` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-chunks` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-tooth` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-raspberry` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-burp` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-puke` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-bubble` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--weapon-lick` | One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. |
+| `--enemy-mothling` | One --enemy-<id> per enemy in content/enemies.kdl: its body, a near-black grey (no colour: they're shadows). |
+| `--enemy-goggler` | One --enemy-<id> per enemy in content/enemies.kdl: its body, a near-black grey (no colour: they're shadows). |
+| `--enemy-gnasher` | One --enemy-<id> per enemy in content/enemies.kdl: its body, a near-black grey (no colour: they're shadows). |
+| `--enemy-sackmaw` | One --enemy-<id> per enemy in content/enemies.kdl: its body, a near-black grey (no colour: they're shadows). |
 
 ## Look
 
 `--look-*` tokens in the `:root` of `src/screens/shared.css`, beside the palette; `src/view/look.ts` reads them as `LOOK`
-(`--look-camera-lift-u` is `LOOK.CAMERA_LIFT_U`). Hues come from the palette; these numbers say how much of them you see.
-Plain numbers, the unit the name's last word (`u`, `s`, `deg`, `rad`, `u-s` per second, `u-s2` per second squared);
-no unit is a strength, a count or a 0..1 amount.
+(`--look-camera-lift-u` is `LOOK.CAMERA_LIFT_U`). Plain numbers, the unit the name's last word (`u`, `s`, `deg`, `rad`,
+`hz`, `px`, `u-s` per second, `u-s2` per second squared); no unit is a strength, a count or a 0..1 amount. Each row
+quotes the comment above it in `shared.css`.
 
 | Name | Use |
 |---|---|
-| `--look-exposure` | tone-mapping exposure, the whole frame |
-| `--look-key-light` | the bulb's intensity (`--light`) |
-| `--look-key-dir` | `x y z` towards the bulb |
-| `--look-fill-light` | bounce light intensity |
-| `--look-glow` | how much enemies glow in their own colour |
-| `--look-wall-glow` | how much the walls glow in their own colour |
-| `--look-vignette` | how dark the screen's edges get (0..1) |
-| `--look-vignette-start` | where the dark starts (0 centre, 1 the corners) |
-| `--look-camera-fov-deg` | field of view |
-| `--look-camera-tilt-rad` | camera tilt off straight down |
-| `--look-camera-margin` | room round the floor (1: edge to edge); the camera backs off to fit it |
-| `--look-camera-lift-u` | how far below the floor's centre the camera looks, so the floor clears the stomach slots |
-| `--look-flash-s` | how long a struck enemy shows white |
-| `--look-flash-glow` | how bright that flash is |
-| `--look-burst-bits` | bits of gore flung out when an enemy pops |
-| `--look-burst-speed-u-s` | how fast they fly |
-| `--look-burst-gravity-u-s2` | how hard they fall back (they splat on the floor) |
-| `--look-burst-s` | how long they last |
-| `--look-shake-u` | how far the camera shakes when you're hurt |
-| `--look-shake-s` | how long it shakes |
-| `--look-wobble` | how much fleshy enemies squash (0..1) |
-| `--look-wobble-hz` | how fast they wobble |
-| `--look-flap-hz` | how fast flies' wings flap |
-| `--look-body-scale` | how big bodies are drawn against what they collide with (1: exactly) |
-| `--look-spawn-grow-s` | how long a new enemy takes to grow in |
-| `--look-windup-shake-u` | how hard a squealer shakes before it charges |
-| `--look-gape-s` | how long the kid's mouth gapes after spitting |
-| `--look-gape` | how wide it gapes (1: shut) |
+| `--look-floor-glow-radius` | The floor's glow: how far it reaches (0..1 of the floor), how far up-screen its brightest point sits, and how much grit breaks it up. |
+| `--look-floor-glow-y-u` | The floor's glow: how far it reaches (0..1 of the floor), how far up-screen its brightest point sits, and how much grit breaks it up. |
+| `--look-floor-grit` | The floor's glow: how far it reaches (0..1 of the floor), how far up-screen its brightest point sits, and how much grit breaks it up. |
+| `--look-floor-plank-u` | The floorboards: how wide a plank is, how dark the gaps between them, how much grain along them, how dark the stains soaked into them. |
+| `--look-floor-seam` | The floorboards: how wide a plank is, how dark the gaps between them, how much grain along them, how dark the stains soaked into them. |
+| `--look-floor-grain` | The floorboards: how wide a plank is, how dark the gaps between them, how much grain along them, how dark the stains soaked into them. |
+| `--look-floor-stain` | The floorboards: how wide a plank is, how dark the gaps between them, how much grain along them, how dark the stains soaked into them. |
+| `--look-floor-edge-soft-u` | No hard edge round the floor: it sinks into the dark over this many u at the walls, to this darkness (0..1). |
+| `--look-floor-edge-dark` | No hard edge round the floor: it sinks into the dark over this many u at the walls, to this darkness (0..1). |
+| `--look-beyond-soft-u` | Beyond the far wall: bright fog, the light the whole room is lit from, fading in over this many u. |
+| `--look-crib-bar-u` | The far wall is the bars of a giant crib: how thick a bar is, how tall, how far apart. |
+| `--look-crib-height-u` | The far wall is the bars of a giant crib: how thick a bar is, how tall, how far apart. |
+| `--look-crib-spacing-u` | The far wall is the bars of a giant crib: how thick a bar is, how tall, how far apart. |
+| `--look-bar-shadow` | The light beyond that wall throws the bars' shadows across the floor: how dark, how much they fan out (per u from the wall), how far they reach before fading. |
+| `--look-bar-shadow-fan` | The light beyond that wall throws the bars' shadows across the floor: how dark, how much they fan out (per u from the wall), how far they reach before fading. |
+| `--look-bar-shadow-reach-u` | The light beyond that wall throws the bars' shadows across the floor: how dark, how much they fan out (per u from the wall), how far they reach before fading. |
+| `--look-warm-halo-u` | The warm light round the kid on the floor: how far it reaches, how bright. |
+| `--look-warm-halo` | The warm light round the kid on the floor: how far it reaches, how bright. |
+| `--look-fog-near-u` | Fog: things this far from the camera start to fade into --fog, and are gone into it this far. |
+| `--look-fog-far-u` | Fog: things this far from the camera start to fade into --fog, and are gone into it this far. |
+| `--look-mist` | Ground fog: banks of mist drifting over the floor, how thick (0..1), how fast, how big a bank is. |
+| `--look-mist-drift-u-s` | Ground fog: banks of mist drifting over the floor, how thick (0..1), how fast, how big a bank is. |
+| `--look-mist-size-u` | Ground fog: banks of mist drifting over the floor, how thick (0..1), how fast, how big a bank is. |
+| `--look-haze` | Haze over the whole frame, and how much more of it at the top (further away). |
+| `--look-haze-top` | Haze over the whole frame, and how much more of it at the top (further away). |
+| `--look-grain` | Film grain: how strong, how many times a second it changes. |
+| `--look-grain-hz` | Film grain: how strong, how many times a second it changes. |
+| `--look-vignette` | The dark round the edges: how dark (0..1), and where it starts (0 centre, 1 the edge of its shape). |
+| `--look-vignette-start` | The dark round the edges: how dark (0..1), and where it starts (0 centre, 1 the edge of its shape). |
+| `--look-vignette-round` | Its shape: 0 follows the screen's edges, 1 is a circle (an old lens). |
+| `--look-edge-layer` | Blurred silhouettes in front of the lens (grass, roots, brambles): how dark, how blurred, how far into the frame (0..1), how much they slide as the kid moves (depth). |
+| `--look-edge-blur-px` | Blurred silhouettes in front of the lens (grass, roots, brambles): how dark, how blurred, how far into the frame (0..1), how much they slide as the kid moves (depth). |
+| `--look-edge-depth` | Blurred silhouettes in front of the lens (grass, roots, brambles): how dark, how blurred, how far into the frame (0..1), how much they slide as the kid moves (depth). |
+| `--look-edge-parallax` | Blurred silhouettes in front of the lens (grass, roots, brambles): how dark, how blurred, how far into the frame (0..1), how much they slide as the kid moves (depth). |
+| `--look-hurt-pulse` | The red pulse round the edges when the kid is hurt: how strong, how long. |
+| `--look-hurt-pulse-s` | The red pulse round the edges when the kid is hurt: how strong, how long. |
+| `--look-rim` | Cutouts: a light edge round every body (`rim-width-u` wide, in body units, brightest on top), plus a little more light caught by the bevel where they turn (how bright, how tight: higher is thinner), where the backlight comes from (x y z on screen), how dark their shadows, how big. |
+| `--look-rim-power` | Cutouts: a light edge round every body (`rim-width-u` wide, in body units, brightest on top), plus a little more light caught by the bevel where they turn (how bright, how tight: higher is thinner), where the backlight comes from (x y z on screen), how dark their shadows, how big. |
+| `--look-rim-width-u` | Cutouts: a light edge round every body (`rim-width-u` wide, in body units, brightest on top), plus a little more light caught by the bevel where they turn (how bright, how tight: higher is thinner), where the backlight comes from (x y z on screen), how dark their shadows, how big. |
+| `--look-rim-dir` | Cutouts: a light edge round every body (`rim-width-u` wide, in body units, brightest on top), plus a little more light caught by the bevel where they turn (how bright, how tight: higher is thinner), where the backlight comes from (x y z on screen), how dark their shadows, how big. |
+| `--look-wall-rim` | The walls catch only a little of that light: they're the dark frame round the floor. |
+| `--look-shadow` | The walls catch only a little of that light: they're the dark frame round the floor. |
+| `--look-child-rim` | The child stands out: their warm edge this many times wider than the creatures', drawn this much bigger, and the night-light they carry: its glow's size (in child units) and brightness. |
+| `--look-child-scale` | The child stands out: their warm edge this many times wider than the creatures', drawn this much bigger, and the night-light they carry: its glow's size (in child units) and brightness. |
+| `--look-lamp-size` | The child stands out: their warm edge this many times wider than the creatures', drawn this much bigger, and the night-light they carry: its glow's size (in child units) and brightness. |
+| `--look-lamp-glow` | The child stands out: their warm edge this many times wider than the creatures', drawn this much bigger, and the night-light they carry: its glow's size (in child units) and brightness. |
+| `--look-shadow-size` | The child stands out: their warm edge this many times wider than the creatures', drawn this much bigger, and the night-light they carry: its glow's size (in child units) and brightness. |
+| `--look-body-scale` | How big bodies are drawn against what they collide with (1: exactly): big heads read better. |
+| `--look-shot-glow` | How big a shot's glow is against the shot itself. |
+| `--look-danger-glow` | An enemy shot's glow is tight: danger is a crisp drop, not a smear. |
+| `--look-danger-size` | How big an enemy shot is drawn against what it hits with, so danger reads at phone size. |
+| `--look-camera-fov-deg` | Camera: field of view, tilt off straight down (slight), room round the floor (1: edge to edge), and how far below its centre it looks, so the floor sits above the HUD's slots. |
+| `--look-camera-tilt-rad` | Camera: field of view, tilt off straight down (slight), room round the floor (1: edge to edge), and how far below its centre it looks, so the floor sits above the HUD's slots. |
+| `--look-camera-margin` | Camera: field of view, tilt off straight down (slight), room round the floor (1: edge to edge), and how far below its centre it looks, so the floor sits above the HUD's slots. |
+| `--look-camera-lift-u` | Camera: field of view, tilt off straight down (slight), room round the floor (1: edge to edge), and how far below its centre it looks, so the floor sits above the HUD's slots. |
+| `--look-flash-s` | Hit: how long a struck enemy's rim flares, how much it squishes, how fast it springs back, for how long. |
+| `--look-squish` | Hit: how long a struck enemy's rim flares, how much it squishes, how fast it springs back, for how long. |
+| `--look-squish-hz` | Hit: how long a struck enemy's rim flares, how much it squishes, how fast it springs back, for how long. |
+| `--look-squish-s` | Hit: how long a struck enemy's rim flares, how much it squishes, how fast it springs back, for how long. |
+| `--look-bulge` | Before an attack: how much an enemy swells, starting this long before it shoots, sprays or charges. |
+| `--look-bulge-s` | Before an attack: how much an enemy swells, starting this long before it shoots, sprays or charges. |
+| `--look-splat-size` | Death: an ink splat this big (against the body), fading over this long; droplets flung out, how fast, how hard they fall, how long they last. |
+| `--look-splat-s` | Death: an ink splat this big (against the body), fading over this long; droplets flung out, how fast, how hard they fall, how long they last. |
+| `--look-burst-bits` | Death: an ink splat this big (against the body), fading over this long; droplets flung out, how fast, how hard they fall, how long they last. |
+| `--look-burst-speed-u-s` | Death: an ink splat this big (against the body), fading over this long; droplets flung out, how fast, how hard they fall, how long they last. |
+| `--look-burst-gravity-u-s2` | Death: an ink splat this big (against the body), fading over this long; droplets flung out, how fast, how hard they fall, how long they last. |
+| `--look-burst-s` | Death: an ink splat this big (against the body), fading over this long; droplets flung out, how fast, how hard they fall, how long they last. |
+| `--look-shake-u` | Shake: how far and how long when the kid is hurt; a smaller nudge when something dies. |
+| `--look-shake-s` | Shake: how far and how long when the kid is hurt; a smaller nudge when something dies. |
+| `--look-kill-shake-u` | Shake: how far and how long when the kid is hurt; a smaller nudge when something dies. |
+| `--look-wobble` | Living things wobble: how much (0..1) and how fast; wings flap faster. |
+| `--look-wobble-hz` | Living things wobble: how much (0..1) and how fast; wings flap faster. |
+| `--look-flap-hz` | Living things wobble: how much (0..1) and how fast; wings flap faster. |
+| `--look-spawn-grow-s` | How long a new enemy takes to grow in, how hard a charger shakes before it charges. |
+| `--look-windup-shake-u` | How long a new enemy takes to grow in, how hard a charger shakes before it charges. |
+| `--look-gape-s` | How long the kid's mouth glows open after a shot, and how wide (1: shut). |
+| `--look-gape` | How long the kid's mouth glows open after a shot, and how wide (1: shut). |
 
 ## Behaviour words
 
@@ -240,14 +301,16 @@ The `kind=` of a weapon: its tile's frame and cooldown bar colour (`--kind-<kind
 
 ## Enemy shapes
 
-The `shape=` of an enemy: its body in the basement (`src/view/scene.ts`), sized by its `r`, always facing the kid.
+The `shape=` of an enemy: its body (`src/view/scene.ts`), a flat black cutout with a light edge that always faces the
+camera and turns to the child, sized by its `r`. Every eye's pupil follows the child; its iris blazes red before an
+attack.
 
 | Shape | Use |
 |---|---|
-| `fly` | a fat dark body, two eyes and two flapping wings; it hovers |
-| `head` | a floating head with black eyes streaming blood and a small mouth; it wobbles |
-| `lump` | a squat lump with a snout and beady eyes; it wobbles |
-| `blob` | a huge body that's mostly mouth, two little eyes on top; it wobbles |
+| `moth` | a fat fuzzy body that's mostly two big eyes, ragged flapping wings, feelers; it hovers |
+| `eyeball` | one enormous eye under a heavy lashed lid, on three stubby feet; a red glow swells round it before it spits |
+| `grin` | a squat lump that's mostly crooked teeth, mismatched beady eyes, stub horns; its mouth glows red before it charges |
+| `sack` | a huge sewn-up sack tied at the top, five eyes of every size, a stitched mouth that glows red before it heaves |
 
 ## Content helpers
 

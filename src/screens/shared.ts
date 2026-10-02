@@ -83,12 +83,12 @@ export const btn = (label: string, tap: () => void, state = '') => use('btn', { 
 
 /**
  * A weapon from content/weapons.kdl. `tag` sits beside its name (its cooldown, its price), `charge` fills its bar
- * (0..1), `foot` is the line under it (buy, sell, its key). `ready` lights it up: it can be fired now. No `tap`: it
- * can't be pressed.
+ * (0..1), `foot` is the line under it (buy, sell, its key). `ready` lights it up: it can be fired now. `compact` drops
+ * the description (the HUD, where the play area needs the room). No `tap`: it can't be pressed.
  */
-export function weapon(id: string, tap: (() => void) | undefined, opts: { key: string; tag: string; charge: number; foot: string; off?: boolean; ready?: boolean }) {
+export function weapon(id: string, tap: (() => void) | undefined, opts: { key: string; tag: string; charge: number; foot: string; off?: boolean; ready?: boolean; compact?: boolean }) {
   const d = weaponDef(id);
-  const state = [d.kind, opts.off && 'off', opts.ready && 'ready'].filter(Boolean).join(' ');
+  const state = [d.kind, opts.off && 'off', opts.ready && 'ready', opts.compact && 'compact'].filter(Boolean).join(' ');
   return use('weapon', { key: opts.key, name: d.name.toUpperCase(), tag: opts.tag, text: d.text, charge: opts.charge, foot: opts.foot, tap, state });
 }
 
@@ -98,6 +98,6 @@ export const emptySlot = (key: string) => use('slot-empty', { key });
 /** A line of text in a dialog's body. */
 export const line = (text: string) => use('line', { key: text, text });
 
-/** A dialog over the dimmed basement: a title, a line under it, a body (a column of lines, or a `row` of tiles) and buttons. */
+/** A dialog over the dimmed nightmare: a title, a line under it, a body (a column of lines, or a `row` of tiles) and buttons. */
 export const dialog = (title: string, sub: string, body: Use[], buttons: Use[], layout: 'column' | 'row' = 'column') =>
   use('dialog', { title, sub, layout }, { body, buttons });

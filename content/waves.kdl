@@ -5,42 +5,42 @@
 //   }
 // Enemy ids are the ones in content/enemies.kdl.
 
-wave "something-buzzing" gap-s=1.0 {
-    fly 6
+wave "the-lights-go-out" gap-s=1.0 {
+    mothling 6
 }
 
-wave "crying-in-the-dark" gap-s=0.9 {
-    fly 4
-    weeper 3
-    fly 4
+wave "something-is-watching" gap-s=0.9 {
+    mothling 4
+    goggler 3
+    mothling 4
 }
 
-wave "squealing" gap-s=0.8 {
-    squealer 2
-    fly 6
-    squealer 2
+wave "teeth-in-the-dark" gap-s=0.8 {
+    gnasher 2
+    mothling 6
+    gnasher 2
 }
 
-wave "wet-crossfire" gap-s=0.7 {
-    weeper 4
-    fly 8
-    squealer 2
+wave "they-all-see-you" gap-s=0.7 {
+    goggler 4
+    mothling 8
+    gnasher 2
 }
 
-wave "the-glutton" gap-s=0.9 {
-    fly 6
-    glutton 1
-    weeper 3
+wave "the-sack" gap-s=0.9 {
+    mothling 6
+    sackmaw 1
+    goggler 3
 }
 
-wave "the-swarm" gap-s=0.35 {
-    fly 24
-    squealer 3
+wave "wings" gap-s=0.35 {
+    mothling 24
+    gnasher 3
 }
 
-wave "the-deep-basement" gap-s=0.7 {
-    glutton 2
-    weeper 5
-    squealer 4
-    fly 10
+wave "the-bottom-of-the-dream" gap-s=0.7 {
+    sackmaw 2
+    goggler 5
+    gnasher 4
+    mothling 10
 }

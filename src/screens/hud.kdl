@@ -1,5 +1,5 @@
-// The HUD during a run (hidden while the shop is open): hearts, wave, pennies and score along the top; the stomach
-// slots along the bottom, each filling its bar as its cooldown comes round, so the basement shows between. Styled in
+// The HUD during a run (hidden while the shop is open): hearts, wave, pennies and score along the top; what's
+// swallowed along the bottom, each filling its bar as its cooldown comes round, so the nightmare shows between. Styled in
 // hud.css; bound in hud.ts.
 prefab "hud" {
     panel class="hud" {

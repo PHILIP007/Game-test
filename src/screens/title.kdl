@@ -1,11 +1,11 @@
-// The title screen, over the basement: the game's name and tagline at the top, how to play in the middle, the play
+// The title screen, over the nightmare: the game's name and tagline at the top, how to play in the middle, the play
 // button and your records at the bottom. Styled in title.css; bound in title.ts.
 prefab "title" {
     panel class="title" {
         panel class="title-scrim"
         panel class="title-top" {
             text class="title-name" "GOB"
-            text class="title-tag" "SPIT. PUKE. SURVIVE THE BASEMENT."
+            text class="title-tag" "A LOST CHILD'S NIGHTMARE"
         }
         panel class="title-how" {
             text class="title-line" "WASD OR ARROWS TO MOVE  ·  THE MOUSE AIMS  ·  ESC PAUSES"

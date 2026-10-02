@@ -1,109 +1,201 @@
 /* The palette (the only :root), shared base styles, and the shared prefabs' styles. Every screen's sheet comes after
-   this one, so a screen styles only its deltas. Colours the basement needs live here too and are read by tokens.ts.
+   this one, so a screen styles only its deltas. Colours the nightmare needs live here too and are read by tokens.ts.
    Sizes are design px (the design space is 390 px tall), times in s. */
 :root {
-  /* UI: a grubby cellar. Bone-white text on dirt-brown panels, blood for the accent. */
-  --ink: #0d0806;
-  --panel: #2a1a14;
-  --panel-ready: #4a2a1c;
-  --edge: #5a3a2c;
-  --text: #f1e4cf;
-  --dim: #a08670;
-  --accent: #e8402a;
-  --scrim: #070403;
-  --heart: #e0201c;
-  --penny: #e3a23a;
+  /* ---------- the two accents: the only colour in the game ---------- */
+  /* Warm: the kid, their shots, their hearts and anything that's theirs. */
+  --warm: #ffb054;
+  --warm-core: #fff0d2;
+  /* Sickly red: enemy attacks and danger (a bulge before an attack, the pulse when you're hurt). */
+  --danger: #b8232b;
+  --danger-core: #e8454c;
+  /* Every creature's iris: a dark grey at rest (no colour on a creature that isn't attacking), blazing to the second
+     colour just before it attacks, so red always means "about to hurt you". */
+  --danger-eye-rest: #3c3c3c;
+  --danger-eye: #e0262e;
+
+  /* ---------- UI: greyscale, so the accents stay loud ---------- */
+  --ink: #050505;
+  --panel: #121212;
+  --panel-ready: #262626;
+  --edge: #3a3a3a;
+  --text: #e4e4e4;
+  --dim: #8a8a8a;
+  --accent: #f0f0f0;
+  --scrim: #000000;
+  --heart: #ffb054;
+  --penny: #c4c4c4;
   --pop: cubic-bezier(.3, 1.7, .5, 1);
   /* Gochi Hand is bundled (src/fonts/fonts.css); the others stand in only if it fails to load. */
   --title-font: "Gochi Hand", "Comic Sans MS", cursive;
   --body-font: "Gochi Hand", "Comic Sans MS", cursive;
-
   /* Tile frames, one per weapon kind (content/weapons.kdl `kind=`). */
-  --kind-attack: #c9b38a;
-  --kind-defend: #7fb8d8;
+  --kind-attack: #9a9a9a;
+  --kind-defend: #d4d4d4;
 
-  /* The basement (tokens.ts): floor, the seams between its tiles, walls, the bulb's hue, the dark round the edges. */
-  --floor: #4a3324;
-  --grid: #33221a;
-  --wall: #261812;
-  --light: #ffd9a0;
+  /* ---------- the world (tokens.ts): a grey haze with black things in it ---------- */
+  /* The floor: bright where the light is, black where it isn't. */
+  --floor-glow: #cdcdcd;
+  --floor-dark: #1e1e1e;
+  /* Beyond the far wall: the bright fog the light comes from (what hangs in front of it reads as silhouette). */
+  --beyond: #c4c4c4;
+  /* The fog things fade into with distance, and the haze laid over the whole frame. */
+  --fog: #9a9a9a;
+  --haze: #b4b4b4;
+  /* The walls, every body (near-black paper cutouts), the thin light on their edges, their shadows. */
+  --wall: #030303;
+  --silhouette: #070707;
+  --rim: #d9d9d9;
+  --shadow: #000000;
+  /* Every creature's eyes: big and pale round an iris (--danger-eye-rest), so they read at a glance; their pupils. */
+  --eye: #e9e9e9;
+  --pupil: #000000;
+  /* Ink: what's left on the floor when something dies. */
+  --splat: #050505;
+  /* The film: the dark round the edges, the blurred silhouettes in front of the lens, the grain. */
   --vignette: #000000;
-  /* The kid: skin, eyes, the mouth everything comes out of; the spit bubble; the aim ring under the cursor. */
-  --kid-skin: #f2d6c2;
-  --kid-eye: #120a08;
-  --kid-mouth: #6e1c1c;
-  --bubble: #bfe6ff;
-  --reticle: #e8402a;
-  /* Every enemy's eyes and mouth. */
-  --eye: #0a0505;
-  --mouth: #3a0808;
+  --edge-silhouette: #000000;
+  --grain: #7f7f7f;
+  /* The aim ring under the cursor and the bubble round the kid: the kid's, so warm. */
+  --reticle: #ffb054;
+  --bubble: #ffcf8a;
 
-  /* What the enemies spit back: blood and bile. */
-  --enemy-spit: #b3121b;
+  /* One --weapon-<id> per weapon in content/weapons.kdl: the kid's shots, all warm. */
+  --weapon-spit: #ffc77a;
+  --weapon-slobber: #ffbf6a;
+  --weapon-chunks: #ffa94a;
+  --weapon-tooth: #fff0d2;
+  --weapon-raspberry: #ffb860;
+  --weapon-burp: #ffd08a;
+  --weapon-puke: #ff9c3a;
+  --weapon-bubble: #ffcf8a;
+  --weapon-lick: #ffd9a8;
 
-  /* One --weapon-<id> per weapon in content/weapons.kdl: the colour of what comes out of the kid's mouth. */
-  --weapon-spit: #d8eef8;
-  --weapon-slobber: #c4e4d8;
-  --weapon-chunks: #c8b46a;
-  --weapon-tooth: #fff8e0;
-  --weapon-raspberry: #ff8fa8;
-  --weapon-burp: #b8d870;
-  --weapon-puke: #9cb43a;
-  --weapon-bubble: #bfe6ff;
-  --weapon-lick: #ff9a8a;
+  /* One --enemy-<id> per enemy in content/enemies.kdl: its body, a near-black grey (no colour: they're shadows). */
+  --enemy-mothling: #070707;
+  --enemy-goggler: #0a0a0a;
+  --enemy-gnasher: #080808;
+  --enemy-sackmaw: #060606;
 
-  /* One --enemy-<id> per enemy in content/enemies.kdl: its body, and its gore when it pops. */
-  --enemy-fly: #2b2b30;
-  --enemy-weeper: #a9b49a;
-  --enemy-squealer: #e88aa0;
-  --enemy-glutton: #a8743c;
-
-  /* The look (view/look.ts): how the render sees the palette's hues, and how hard the juice hits. Plain numbers; the
-     unit is the name's last word (u = world units, s, deg, rad, hz; u-s = units per second, u-s2 per second squared);
-     no unit is a strength. */
-  /* Tone-mapping exposure: the whole frame. A dim cellar. */
-  --look-exposure: 0.95;
-  /* The bulb overhead: its strength, and where it hangs (x y z towards it). */
-  --look-key-light: 2.6;
-  --look-key-dir: -2 10 3;
-  /* Bounce light, so the unlit side isn't black. */
-  --look-fill-light: 0.7;
-  /* How much enemies glow in their own colour (0: not at all). Low: they're flesh, not neon. */
-  --look-glow: 0.05;
-  /* How much the walls glow in their own colour. */
-  --look-wall-glow: 0;
-  /* The dark round the edges of the screen: how dark (0..1), and where it starts (0 centre, 1 the corners). */
-  --look-vignette: 0.85;
-  --look-vignette-start: 0.35;
-  /* Camera: field of view, tilt off straight down, how much room round the basement (1: edge to edge), and how far
-     below its centre it looks, so the floor sits above the stomach slots. */
-  --look-camera-fov-deg: 38;
-  --look-camera-tilt-rad: 0.62;
-  --look-camera-margin: 1.34;
-  --look-camera-lift-u: 1.6;
-  /* Hit flash: how long a struck enemy shows white, and how bright. */
+  /* The look (view/look.ts): how the fog lies, how hard the film bites, how the juice moves. Plain numbers; the unit
+     is the name's last word (u = world units, s, deg, rad, hz, px; u-s = units per second, u-s2 per second
+     squared); no unit is a strength or a 0..1 amount. */
+  /* The floor's glow: how far it reaches (0..1 of the floor), how far up-screen its brightest point sits, and how
+     much grit breaks it up. */
+  --look-floor-glow-radius: 0.7;
+  --look-floor-glow-y-u: -4.5;
+  --look-floor-grit: 0.08;
+  /* The floorboards: how wide a plank is, how dark the gaps between them, how much grain along them, how dark the
+     stains soaked into them. */
+  --look-floor-plank-u: 1.15;
+  --look-floor-seam: 0.2;
+  --look-floor-grain: 0.12;
+  --look-floor-stain: 0.25;
+  /* No hard edge round the floor: it sinks into the dark over this many u at the walls, to this darkness (0..1). */
+  --look-floor-edge-soft-u: 1.6;
+  --look-floor-edge-dark: 0.55;
+  /* Beyond the far wall: bright fog, the light the whole room is lit from, fading in over this many u. */
+  --look-beyond-soft-u: 3;
+  /* The far wall is the bars of a giant crib: how thick a bar is, how tall, how far apart. */
+  --look-crib-bar-u: 0.16;
+  --look-crib-height-u: 4.5;
+  --look-crib-spacing-u: 1.1;
+  /* The light beyond that wall throws the bars' shadows across the floor: how dark, how much they fan out (per u
+     from the wall), how far they reach before fading. */
+  --look-bar-shadow: 0.42;
+  --look-bar-shadow-fan: 0.09;
+  --look-bar-shadow-reach-u: 9;
+  /* The warm light round the kid on the floor: how far it reaches, how bright. */
+  --look-warm-halo-u: 1.9;
+  --look-warm-halo: 0.75;
+  /* Fog: things this far from the camera start to fade into --fog, and are gone into it this far. */
+  --look-fog-near-u: 30;
+  --look-fog-far-u: 140;
+  /* Ground fog: banks of mist drifting over the floor, how thick (0..1), how fast, how big a bank is. */
+  --look-mist: 0.28;
+  --look-mist-drift-u-s: 0.25;
+  --look-mist-size-u: 3.5;
+  /* Haze over the whole frame, and how much more of it at the top (further away). */
+  --look-haze: 0.03;
+  --look-haze-top: 0.07;
+  /* Film grain: how strong, how many times a second it changes. */
+  --look-grain: 0.12;
+  --look-grain-hz: 24;
+  /* The dark round the edges: how dark (0..1), and where it starts (0 centre, 1 the edge of its shape). */
+  --look-vignette: 0.97;
+  --look-vignette-start: 0.4;
+  /* Its shape: 0 follows the screen's edges, 1 is a circle (an old lens). */
+  --look-vignette-round: 0.75;
+  /* Blurred silhouettes in front of the lens (grass, roots, brambles): how dark, how blurred, how far into the frame
+     (0..1), how much they slide as the kid moves (depth). */
+  --look-edge-layer: 1;
+  --look-edge-blur-px: 12;
+  --look-edge-depth: 0.34;
+  --look-edge-parallax: 0.015;
+  /* The red pulse round the edges when the kid is hurt: how strong, how long. */
+  --look-hurt-pulse: 0.55;
+  --look-hurt-pulse-s: 0.45;
+  /* Cutouts: a light edge round every body (`rim-width-u` wide, in body units, brightest on top), plus a little more
+     light caught by the bevel where they turn (how bright, how tight: higher is thinner), where the backlight comes
+     from (x y z on screen), how dark their shadows, how big. */
+  --look-rim: 0.8;
+  --look-rim-power: 3;
+  --look-rim-width-u: 0.05;
+  --look-rim-dir: 0 1 0.4;
+  /* The walls catch only a little of that light: they're the dark frame round the floor. */
+  --look-wall-rim: 0.12;
+  --look-shadow: 0.55;
+  /* The child stands out: their warm edge this many times wider than the creatures', drawn this much bigger, and the
+     night-light they carry: its glow's size (in child units) and brightness. */
+  --look-child-rim: 2.4;
+  --look-child-scale: 1.25;
+  --look-lamp-size: 1.5;
+  --look-lamp-glow: 0.95;
+  --look-shadow-size: 1.4;
+  /* How big bodies are drawn against what they collide with (1: exactly): big heads read better. */
+  --look-body-scale: 1.85;
+  /* How big a shot's glow is against the shot itself. */
+  --look-shot-glow: 3.2;
+  /* An enemy shot's glow is tight: danger is a crisp drop, not a smear. */
+  --look-danger-glow: 1.7;
+  /* How big an enemy shot is drawn against what it hits with, so danger reads at phone size. */
+  --look-danger-size: 1.5;
+  /* Camera: field of view, tilt off straight down (slight), room round the floor (1: edge to edge), and how far below
+     its centre it looks, so the floor sits above the HUD's slots. */
+  --look-camera-fov-deg: 36;
+  --look-camera-tilt-rad: 0.3;
+  --look-camera-margin: 1.2;
+  --look-camera-lift-u: -0.6;
+  /* Hit: how long a struck enemy's rim flares, how much it squishes, how fast it springs back, for how long. */
   --look-flash-s: 0.08;
-  --look-flash-glow: 0.9;
-  /* Pop: gore flung out when an enemy dies, how fast, how hard it falls back, how long it lasts. */
-  --look-burst-bits: 18;
+  --look-squish: 0.35;
+  --look-squish-hz: 7;
+  --look-squish-s: 0.35;
+  /* Before an attack: how much an enemy swells, starting this long before it shoots, sprays or charges. */
+  --look-bulge: 0.3;
+  --look-bulge-s: 0.9;
+  /* Death: an ink splat this big (against the body), fading over this long; droplets flung out, how fast, how hard
+     they fall, how long they last. */
+  --look-splat-size: 1.4;
+  --look-splat-s: 6;
+  --look-burst-bits: 12;
   --look-burst-speed-u-s: 6;
-  --look-burst-gravity-u-s2: 22;
-  --look-burst-s: 0.7;
-  /* Screen shake when the kid is hurt: how far, how long. */
-  --look-shake-u: 0.35;
-  --look-shake-s: 0.3;
-  /* Fleshy things wobble: how much they squash (0..1) and how fast. Flies' wings flap faster. */
-  --look-wobble: 0.08;
-  --look-wobble-hz: 2.2;
-  --look-flap-hz: 22;
-  /* How big bodies are drawn against what they collide with (1: exactly): cartoon-big heads read better. */
-  --look-body-scale: 1.45;
-  /* How long a new enemy takes to grow in, how hard a squealer shakes before it charges. */
-  --look-spawn-grow-s: 0.25;
-  --look-windup-shake-u: 0.25;
-  /* How long the kid's mouth gapes after spitting, and how wide (1: shut). */
+  --look-burst-gravity-u-s2: 24;
+  --look-burst-s: 0.6;
+  /* Shake: how far and how long when the kid is hurt; a smaller nudge when something dies. */
+  --look-shake-u: 0.3;
+  --look-shake-s: 0.25;
+  --look-kill-shake-u: 0.06;
+  /* Living things wobble: how much (0..1) and how fast; wings flap faster. */
+  --look-wobble: 0.05;
+  --look-wobble-hz: 1.8;
+  --look-flap-hz: 18;
+  /* How long a new enemy takes to grow in, how hard a charger shakes before it charges. */
+  --look-spawn-grow-s: 0.3;
+  --look-windup-shake-u: 0.12;
+  /* How long the kid's mouth glows open after a shot, and how wide (1: shut). */
   --look-gape-s: 0.12;
-  --look-gape: 1.8;
+  --look-gape: 2;
 }
 
 text { font-family: var(--body-font); font-color: var(--text); font-size: 16px }
@@ -130,6 +222,10 @@ button.weapon {
 .weapon.attack { border-color: var(--kind-attack) }
 .weapon.defend { border-color: var(--kind-defend) }
 .weapon.off { opacity: .4 }
+/* Compact (the HUD): no description, short, see-through, so the play area keeps the room. */
+.weapon.compact { width: 128px; height: 50px; opacity: .88 }
+.weapon.compact .weapon-text { display: none }
+.weapon.compact .weapon-name, .weapon.compact .weapon-tag { font-size: 13px }
 /* A called weapon that can fire now: the tile lifts and its foot line lights up, so you see it's yours to use. */
 .weapon.ready { background-color: var(--panel-ready); translate: 0 -4px }
 .weapon.ready .weapon-foot { font-color: var(--accent) }
@@ -150,7 +246,7 @@ button.weapon {
 /* A line of text in a dialog's body. */
 .shared-line { font-size: 18px; letter-spacing: 1px; font-color: var(--dim); text-align: center }
 
-/* A dialog over the basement: the dimmed basement behind, a title, a line, its body (tiles, lines) and its buttons. */
+/* A dialog over the nightmare: the dimmed nightmare behind, a title, a line, its body (tiles, lines) and its buttons. */
 .dialog { width: 100%; height: 100%; align-items: center; justify-content: center; gap: 12px; pointer-events: auto }
 .dialog-scrim { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: var(--scrim); opacity: .72 }
 .dialog-title { font-family: var(--title-font); font-size: 40px; letter-spacing: 4px; font-color: var(--accent); animation: dialog-in .45s var(--pop) }

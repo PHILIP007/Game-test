@@ -1,9 +1,11 @@
 # Gob
 
-A gross-out top-down shooter for the web, in the spirit of Edmund McMillen's basement games (an original homage:
-none of his characters or art). You're a big-headed kid in a dim basement, and everything you fight with comes out
-of your mouth. Flies swarm you, weeping heads cry blood from a distance, squealing lumps charge, and the Glutton
-heaves rings of bile.
+A top-down shooter for the web: a lost child's nightmare. The look borrows its lighting from Limbo (black paper-cutout
+silhouettes in grey fog, light pouring through the bars of a giant crib, film grain, a heavy vignette, blurred shapes in
+front of the lens) and its creature feel from The Binding of Isaac (chunky, big-headed, big-eyed things that are cute
+and gross at once), with every design original. The world is greyscale: the only colours are the child's warm glow and
+the sickly red of danger. The child, in a nightshirt and nightcap with a night-light at their side, spits at the
+things in the dark: fuzzy mothlings, the one-eyed goggler, the grinning gnasher and the many-eyed sackmaw.
 
 You can have up to four things swallowed, each on its own cooldown. Whatever's in slot 1 (spit, to start) spits at
 the cursor by itself; the others charge up and wait for you to call them: a loose tooth that goes through a whole
