@@ -1,0 +1,50 @@
+/* The palette (the only :root), shared base styles, and the shared prefabs' styles. Every screen's sheet comes after
+   this one, so a screen styles only its deltas. Colours the 3D scene needs live here too and are read by tokens.ts.
+   Sizes are design px (the design space is 390 px tall), times in s. PLACEHOLDER values: make them your game's. */
+:root {
+  /* UI */
+  --ink: #0b0d12;
+  --panel: #161a22;
+  --edge: #39414f;
+  --text: #e8ecf2;
+  --dim: #8a93a3;
+  --accent: #6cc4ff;
+  --scrim: #05060a;
+  --pop: cubic-bezier(.3, 1.7, .5, 1);
+  --title-font: Arial, sans-serif;
+  --body-font: Arial, sans-serif;
+
+  /* The scene (tokens.ts): the floor, the light's hue, and one --thing-<id> per thing in content/things.kdl. */
+  --floor: #2a2f3a;
+  --light: #fff4e0;
+  --thing-orb: #6cc4ff;
+  --thing-gem: #ff6ca8;
+
+  /* The look (view/look.ts): how the render sees the palette's hues. Plain numbers; the unit is the name's last word
+     (u = world units, deg, rad); no unit is a strength. */
+  /* Tone-mapping exposure: the whole frame. */
+  --look-exposure: 1.1;
+  /* The key light's strength, and where it shines from (x y z towards it). */
+  --look-key-light: 2.2;
+  --look-key-dir: 3 8 4;
+  /* Sky/ground fill, so the unlit side isn't black. */
+  --look-fill-light: 0.8;
+  /* Camera: field of view, distance from the field's centre, and tilt off straight down. */
+  --look-camera-fov-deg: 40;
+  --look-camera-dist-u: 14;
+  --look-camera-tilt-rad: 0.35;
+}
+
+text { font-family: var(--body-font); font-color: var(--text); font-size: 16px }
+
+/* A button: the consumer sets width/height when the default doesn't fit. */
+button {
+  width: 180px; height: max(44px, var(--touch-size)); align-items: center; justify-content: center;
+  background-color: var(--panel); border-color: var(--edge); border-width: 2px;
+  transition: scale .08s ease-out, background-color .12s;
+}
+button:hover { border-color: var(--accent) }
+button:pressed { scale: .94 }
+button.primary { border-color: var(--accent) }
+button.off { opacity: .45 }
+.shared-btn-label { font-family: var(--title-font); font-size: 16px; letter-spacing: 3px; font-color: var(--text) }

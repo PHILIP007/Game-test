@@ -1,0 +1,15 @@
+// The things scattered on the field. PLACEHOLDER: replace with your game's content.
+//   thing "id" name="Shown name" r=<radius, u> paint="--token" { reward words }
+// `paint` is a palette token in src/screens/shared.css :root. Reward words go one per line inside the braces; what each
+// does is in src/rewards.ts and the catalog (docs/declarative-ui.md, ## Behaviour words):
+//   points n    collecting it scores n points
+
+// Big and cheap.
+thing "orb" name="Orb" r=0.5 paint="--thing-orb" {
+    points 1
+}
+
+// Small and worth more.
+thing "gem" name="Gem" r=0.3 paint="--thing-gem" {
+    points 5
+}

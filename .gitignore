@@ -1,0 +1,7 @@
+node_modules
+dist
+storybook-static
+*.log
+scripts/tmp
+models/__pycache__
+shots/

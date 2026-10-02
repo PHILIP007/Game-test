@@ -1,0 +1,18 @@
+// The title screen: the game's name, the score and a meter of what's left in the batch along the top; the buttons
+// (from title.ts) and the best score along the bottom, so the 3D field shows between. Styled in title.css.
+// PLACEHOLDER: the starter's only screen; make it your game's.
+prefab "title" {
+    panel class="title" {
+        panel class="title-top" {
+            text class="title-name" "MY GAME"
+            text class="title-score" bind="score"
+            panel class="title-left" {
+                meter class="title-left-fill" value=(bind)"left"
+            }
+        }
+        panel class="title-bottom" {
+            panel class="title-buttons" slot="buttons"
+            text class="title-best" bind="best"
+        }
+    }
+}
