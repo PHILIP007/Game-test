@@ -1,0 +1,31 @@
+// The HUD during a run: hull and wave and score along the top; energy, the hand of cards and the piles along the
+// bottom, so the arena shows between. Styled in hud.css; bound in hud.ts.
+prefab "hud" {
+    panel class="hud" {
+        panel class="hud-top" {
+            panel class="hud-hull" {
+                text class="hud-label" "HULL"
+                panel class="hud-bar" {
+                    meter class="hud-hull-fill" value=(bind)"hull"
+                }
+                text class="hud-num" bind="hullText"
+            }
+            text class="hud-wave" bind="wave"
+            text class="hud-score" bind="score"
+        }
+        panel class="hud-bottom" {
+            panel class="hud-energy" {
+                text class="hud-energy-num" bind="energy"
+                text class="hud-label" "ENERGY"
+                panel class="hud-bar" {
+                    meter class="hud-energy-fill" value=(bind)"charge"
+                }
+            }
+            panel class="hud-hand" slot="hand"
+            panel class="hud-piles" {
+                text class="hud-pile" bind="deck"
+                text class="hud-pile" bind="discard"
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+/* The HUD (hud.kdl), over the arena during a run. Sizes are design px, times in s. */
+.hud { width: 100%; height: 100%; justify-content: space-between; padding: 8px 12px 8px 12px }
+.hud-top { flex-direction: row; align-items: center; justify-content: space-between }
+.hud-bottom { flex-direction: row; align-items: flex-end; justify-content: space-between }
+.hud-label { font-family: var(--title-font); font-size: 11px; letter-spacing: 2px; font-color: var(--dim) }
+.hud-num { font-family: var(--title-font); font-size: 13px }
+.hud-bar { width: 120px; height: 8px; background-color: var(--panel); border-color: var(--edge); border-width: 1px }
+
+.hud-hull { flex-direction: row; align-items: center; gap: 8px; width: 240px }
+.hud-hull-fill { width: 100%; height: 100%; tint: var(--hull); transition: scale .2s }
+.hud-wave { font-family: var(--title-font); font-size: 16px; letter-spacing: 4px; font-color: var(--accent) }
+.hud-score { font-family: var(--title-font); font-size: 14px; letter-spacing: 2px; width: 240px; text-align: right }
+
+.hud-energy { width: 120px; gap: 4px }
+.hud-energy-num { font-family: var(--title-font); font-size: 30px; font-color: var(--energy) }
+.hud-energy-fill { width: 100%; height: 100%; tint: var(--energy) }
+.hud-hand { flex-direction: row; gap: 8px }
+.hud-piles { width: 120px; align-items: flex-end; gap: 2px }
+.hud-pile { font-size: 11px; letter-spacing: 1px; font-color: var(--dim) }

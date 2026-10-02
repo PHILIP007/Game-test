@@ -1,0 +1,2 @@
+// The game-over dialog: the shared `dialog` prefab (shared.kdl) with the run's numbers as lines, and buttons to go
+// again or back to the title. Nothing of its own to lay out; its words are in over.ts, its deltas in over.css.

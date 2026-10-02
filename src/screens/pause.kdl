@@ -1,0 +1,2 @@
+// The pause dialog: the shared `dialog` prefab (shared.kdl) with a reminder of the controls, and buttons to resume
+// or quit to the title. Nothing of its own to lay out; its words are in pause.ts, its deltas in pause.css.

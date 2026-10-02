@@ -1,0 +1,2 @@
+// The reward after a cleared wave: the shared `dialog` prefab (shared.kdl) holding the cards on offer in a row, and a
+// skip button. Nothing of its own to lay out; its words are in reward.ts, its deltas in reward.css.

@@ -1,0 +1,46 @@
+// The waves, in order. After the last one the list starts again from the top, and every enemy has more health each
+// time round (LAP_HP_STEP in src/tuning.ts).
+//   wave "id" gap-s=<seconds between spawns> {
+//       <enemy id> <how many>     one line per group, in the order they come
+//   }
+// Enemy ids are the ones in content/enemies.kdl.
+
+wave "first-contact" gap-s=1.0 {
+    crawler 6
+}
+
+wave "spitters" gap-s=0.9 {
+    crawler 4
+    spitter 3
+    crawler 4
+}
+
+wave "chargers" gap-s=0.8 {
+    charger 2
+    crawler 6
+    charger 2
+}
+
+wave "crossfire" gap-s=0.7 {
+    spitter 4
+    crawler 8
+    charger 2
+}
+
+wave "the-brute" gap-s=0.9 {
+    crawler 6
+    brute 1
+    spitter 3
+}
+
+wave "swarm" gap-s=0.35 {
+    crawler 24
+    charger 3
+}
+
+wave "siege" gap-s=0.7 {
+    brute 2
+    spitter 5
+    charger 4
+    crawler 10
+}

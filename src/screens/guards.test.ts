@@ -1,6 +1,6 @@
 // Foundation guards: vocabulary is defined in one home, colours in one palette.
 import { describe, expect, it } from 'vitest';
-import { THINGS } from '../content';
+import { CARDS, ENEMIES } from '../content';
 import { TOKENS } from '../tokens';
 
 const SRC = import.meta.glob<string>(['../**/*.ts', '!../**/*.test.ts', '!../stories/**'], { query: '?raw', import: 'default', eager: true });
@@ -28,6 +28,10 @@ describe('foundation guards', () => {
     expect(dupes).toEqual([]);
   });
   it('every paint in the content is a palette token', () => {
-    expect(Object.values(THINGS).filter((t) => !(t.paint in TOKENS)).map((t) => `${t.id}: ${t.paint}`)).toEqual([]);
+    expect([...Object.values(CARDS), ...Object.values(ENEMIES)].filter((t) => !(t.paint in TOKENS)).map((t) => `${t.id}: ${t.paint}`)).toEqual([]);
+  });
+  it('every card has its --card-<id> paint, every enemy its --enemy-<id> (names follow the fiction)', () => {
+    expect(Object.values(CARDS).filter((c) => c.paint !== `--card-${c.id}`).map((c) => c.id)).toEqual([]);
+    expect(Object.values(ENEMIES).filter((e) => e.paint !== `--enemy-${e.id}`).map((e) => e.id)).toEqual([]);
   });
 });

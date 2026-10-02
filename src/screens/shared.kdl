@@ -7,3 +7,33 @@ prefab "btn" {
         text class="shared-btn-label" bind="label"
     }
 }
+
+// A card from content/cards.kdl: card(id, tap, hotkey?, off?) in shared.ts. Its kind (attack, move, power) and
+// `off` become classes.
+prefab "card" {
+    button class="card" bind-class="state" tap="tap" {
+        panel class="card-top" {
+            text class="card-cost" bind="cost"
+            text class="card-name" bind="name"
+        }
+        text class="card-text" bind="text"
+        text class="card-hotkey" bind="hotkey"
+    }
+}
+
+// One line of text in a dialog's body: line(text) in shared.ts.
+prefab "line" {
+    text class="shared-line" bind="text"
+}
+
+// A dialog over the dimmed arena: dialog(title, sub, body, buttons, layout?) in shared.ts. It swallows taps, so
+// nothing behind it can be pressed. `layout` is the body's class: a column of lines, or a `row` of cards.
+prefab "dialog" {
+    panel class="dialog" {
+        panel class="dialog-scrim"
+        text class="dialog-title" bind="title"
+        text class="dialog-sub" bind="sub"
+        panel class="dialog-body" bind-class="layout" slot="body"
+        panel class="dialog-buttons" slot="buttons"
+    }
+}

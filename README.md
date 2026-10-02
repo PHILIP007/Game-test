@@ -1,18 +1,39 @@
-# Starter
+# Deckfire
 
-The game-bible foundation as a project you copy on day one: the declarative UI engine, the content loader, the game
-clock, the seeded RNG, the guard tests, the Storybook harness, the Blender model kit, and a tiny placeholder game
-that uses every layer once so the patterns are there to copy.
+A deck-building top-down arena shooter for the web. Waves of enemies pour in from the arena's edge; your blaster fires
+at the cursor on its own, and the cards in your hand are the decisions: fans of shots, piercing rails, dashes,
+shields, novas. Cards cost energy, which refills over time. Clear a wave and you pick a card to add to your deck.
 
-## Start a game
+**Controls:** WASD or arrows to move, the mouse aims, 1 2 3 4 (or click) plays a card, Esc pauses.
+
+Enemies: the **crawler** swarms you, the **spitter** circles at range and shoots, the **charger** stops, shakes and
+lunges, and the **brute** is a slow, huge sponge that sprays rings of shots.
+
+Built on the game-bible (`.claude/skills/game-bible`): TypeScript, Vite, Three for the arena, Pixi with a
+declarative KDL/CSS dialect for the UI, zod-checked KDL content, a pure core with a seeded RNG, Storybook stories as
+tests.
+
+## Where to change things
+
+| Change | Home |
+|---|---|
+| A card: cost, words, text, starting copies | `content/cards.kdl` |
+| An enemy: health, size, how it moves and attacks, what it drops | `content/enemies.kdl` |
+| What each wave sends, in what order, how fast | `content/waves.kdl` |
+| A number a rule reads (speeds, energy, hand size, cooldowns) | `src/tuning.ts` |
+| Any colour, the camera, the light, the juice | `src/screens/shared.css` (`:root`) |
+| A screen's layout and look | `src/screens/<screen>.kdl` and `.css` |
+| The words cards, enemies and drops can use | `src/cards.ts`, `src/enemies.ts`, `src/rewards.ts` |
+
+Every word, token, prefab and screen is listed in `docs/declarative-ui.md`; a test fails when it and the code disagree.
+
+## Start
 
 ```sh
-cp -r <skill dir>/starter my-game && cd my-game && npm install
+npm install
 npx playwright install chromium   # once per machine, for the story tests
-git init && git add -A && git commit -m "Start from the game-bible starter"
+npm run dev
 ```
-
-Then rename `"name"` in `package.json`, `META_KEY` in `src/store.ts` and the `<title>` in `index.html`.
 
 ## Commands
 
@@ -30,31 +51,14 @@ Then rename `"name"` in `package.json`, `META_KEY` in `src/store.ts` and the `<t
 
 ## What's here
 
-Foundation (keep; change only with a catalog row and a test):
+- The rules, pure: `src/game.ts` (a run: waves, the fight's step, cards, rewards, meta), `src/world.ts` (the run's
+  shape, geometry, firing), `src/cards.ts`, `src/enemies.ts`, `src/rewards.ts` (behaviour words), `src/content.ts`
+  (the content kinds), `src/tuning.ts`. Tests: `src/game.test.ts`; balance: `npm run sim`.
+- The shell: `src/store.ts`, `src/actions.ts`, `src/input.ts`, `src/runtime.ts`, `src/view/scene.ts` (the arena in
+  Three), `src/screens/` (title, hud, reward, over, pause).
+- Foundation from the game-bible starter (keep; change only with a catalog row and a test): `src/decl/`,
+  `src/content-load.ts`, `src/clock.ts`, `src/rng.ts`, `src/tokens.ts`, `src/view/look.ts`, `src/stage.ts`, the
+  guard tests, `src/stories/stage.ts`, `.storybook/`, `scripts/`, `models/kit.py`.
 
-- `src/decl/`: the declarative UI engine (`css.ts` pure, `engine.ts` Pixi) and its tests
-- `src/content-load.ts`: `loadKdl`, `combinators`, `tunedText`
-- `src/clock.ts`, `src/rng.ts`, `src/tokens.ts`, `src/view/look.ts`, `src/stage.ts`
-- guards: `src/core-purity.test.ts`, `src/screens/screen-imports.test.ts`, `src/screens/guards.test.ts`,
-  `src/catalog.test.ts` (keep `CORE` in the first two in step as core modules come and go)
-- `src/stories/stage.ts` (the story harness and tap driver), `.storybook/`
-- `scripts/`, `models/kit.py`, configs
-
-Placeholders (replace with your game):
-
-| File | The placeholder |
-|---|---|
-| `src/game.ts`, `src/game.test.ts` | the rules: collect a thing, score its reward words, a fresh batch when the field is empty; the saved meta |
-| `src/rewards.ts` | one behaviour word, `points n` |
-| `src/tuning.ts` | the field size and batch size |
-| `src/content.ts`, `content/things.kdl` | one content kind, `thing` |
-| `src/store.ts`, `src/actions.ts`, `src/runtime.ts` | keep the shape, change the state and the actions |
-| `src/view/scene.ts` | a Three scene with a sphere per thing, reconciled by id |
-| `src/screens/title.*` | the one screen |
-| `src/screens/shared.*` | the palette, look tokens, one prefab (`btn`), one element (`meter`), one property (`tint`) |
-| `src/stories/Screens.stories.ts` | one story with a `play` |
-| `scripts/sim.ts` | a bot that always collects the first thing |
-| `docs/declarative-ui.md` | the catalog: engine rows stay, rows marked PLACEHOLDER go when their code does |
-
-There are no model scripts yet: the first `models/<name>.py` imports `kit` and follows the rig contract in its
-header. When the game loads models, add a loader and a test that checks every committed `.glb` against that contract.
+There are no Blender models yet: enemies are primitive meshes picked by `shape=` in `content/enemies.kdl`. The first
+`models/<name>.py` imports `kit` and follows the rig contract in its header.

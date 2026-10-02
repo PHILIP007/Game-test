@@ -1,14 +1,16 @@
-// The title screen: the game's name, the score and a meter of what's left in the batch along the top; the buttons
-// (from title.ts) and the best score along the bottom, so the 3D field shows between. Styled in title.css.
-// PLACEHOLDER: the starter's only screen; make it your game's.
+// The title screen, over the arena: the game's name and tagline at the top, how to play in the middle, the play
+// button and your records at the bottom. Styled in title.css; bound in title.ts.
 prefab "title" {
     panel class="title" {
+        panel class="title-scrim"
         panel class="title-top" {
-            text class="title-name" "MY GAME"
-            text class="title-score" bind="score"
-            panel class="title-left" {
-                meter class="title-left-fill" value=(bind)"left"
-            }
+            text class="title-name" "DECKFIRE"
+            text class="title-tag" "A DECK-BUILDING ARENA SHOOTER"
+        }
+        panel class="title-how" {
+            text class="title-line" "WASD OR ARROWS TO MOVE  ·  THE MOUSE AIMS  ·  YOUR BLASTER FIRES ON ITS OWN"
+            text class="title-line" "1 2 3 4 OR CLICK A CARD TO PLAY IT  ·  CARDS COST ENERGY, WHICH REFILLS"
+            text class="title-line" "CLEAR A WAVE, ADD A CARD TO YOUR DECK  ·  ESC PAUSES"
         }
         panel class="title-bottom" {
             panel class="title-buttons" slot="buttons"

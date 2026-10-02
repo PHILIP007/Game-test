@@ -3,6 +3,7 @@
 import { Container, Graphics } from 'pixi.js';
 import { color, defineProp, lerpColor } from '../decl/css';
 import { createUi, defineElement, use, type Use, type UiNode } from '../decl/engine';
+import { cardDef } from '../content';
 import { layers, view } from '../stage';
 import sharedKdl from './shared.kdl?raw';
 import sharedCss from './shared.css?raw';
@@ -62,3 +63,16 @@ export const tickScreens = (dt: number) => screens.reduce((busy, s) => { s.tick(
 
 /** A button: `state` is space-joined classes its CSS matches on (`primary`, `off`). */
 export const btn = (label: string, tap: () => void, state = '') => use('btn', { key: label, label, tap, state });
+
+/** A card from content/cards.kdl. `key` keeps its identity in a row (a hand slot, an offer position). */
+export function card(id: string, tap: () => void, opts: { key: string; hotkey?: string; off?: boolean }) {
+  const d = cardDef(id);
+  return use('card', { key: opts.key, cost: String(d.cost), name: d.name.toUpperCase(), text: d.text, hotkey: opts.hotkey ?? '', tap, state: `${d.kind}${opts.off ? ' off' : ''}` });
+}
+
+/** A line of text in a dialog's body. */
+export const line = (text: string) => use('line', { key: text, text });
+
+/** A dialog over the dimmed arena: a title, a line under it, a body (a column of lines, or a `row` of cards) and buttons. */
+export const dialog = (title: string, sub: string, body: Use[], buttons: Use[], layout: 'column' | 'row' = 'column') =>
+  use('dialog', { title, sub, layout }, { body, buttons });

@@ -1,38 +1,90 @@
 /* The palette (the only :root), shared base styles, and the shared prefabs' styles. Every screen's sheet comes after
-   this one, so a screen styles only its deltas. Colours the 3D scene needs live here too and are read by tokens.ts.
-   Sizes are design px (the design space is 390 px tall), times in s. PLACEHOLDER values: make them your game's. */
+   this one, so a screen styles only its deltas. Colours the arena needs live here too and are read by tokens.ts.
+   Sizes are design px (the design space is 390 px tall), times in s. */
 :root {
   /* UI */
-  --ink: #0b0d12;
-  --panel: #161a22;
-  --edge: #39414f;
-  --text: #e8ecf2;
-  --dim: #8a93a3;
-  --accent: #6cc4ff;
-  --scrim: #05060a;
+  --ink: #07090f;
+  --panel: #121828;
+  --edge: #2c3754;
+  --text: #e9eefb;
+  --dim: #8792ad;
+  --accent: #ffcf4a;
+  --scrim: #03040a;
+  --hull: #ff5470;
+  --energy: #4ad8ff;
   --pop: cubic-bezier(.3, 1.7, .5, 1);
-  --title-font: Arial, sans-serif;
+  --title-font: "Trebuchet MS", Arial, sans-serif;
   --body-font: Arial, sans-serif;
 
-  /* The scene (tokens.ts): the floor, the light's hue, and one --thing-<id> per thing in content/things.kdl. */
-  --floor: #2a2f3a;
-  --light: #fff4e0;
-  --thing-orb: #6cc4ff;
-  --thing-gem: #ff6ca8;
+  /* Card frames, one per card kind (content/cards.kdl `kind=`). */
+  --kind-attack: #ff8a3d;
+  --kind-move: #4ad8ff;
+  --kind-power: #b98aff;
 
-  /* The look (view/look.ts): how the render sees the palette's hues. Plain numbers; the unit is the name's last word
-     (u = world units, deg, rad); no unit is a strength. */
+  /* The arena (tokens.ts): floor, grid lines, walls, the light's hue. */
+  --floor: #0e1322;
+  --grid: #1b2440;
+  --wall: #3b4cff;
+  --light: #f4f1ff;
+  /* The pilot, its shield bubble, and the aim ring under the cursor. */
+  --pilot: #f4f6ff;
+  --shield: #6ff0ff;
+  --reticle: #ffcf4a;
+
+  /* Shots: the blaster's and the enemies'. A card's shots take its own paint, below. */
+  --shot-blaster: #fff3b0;
+  --shot-foe: #ff3d6e;
+
+  /* One --card-<id> per card in content/cards.kdl: its shots' colour. */
+  --card-scatter: #ffae42;
+  --card-rail: #8af7ff;
+  --card-dash: #4ad8ff;
+  --card-surge: #c6a4ff;
+  --card-nova: #ff7af0;
+  --card-barrage: #ff6a3d;
+  --card-barrier: #6ff0ff;
+  --card-overclock: #fff06a;
+  --card-blink: #7dc8ff;
+  --card-patch: #7dffa8;
+
+  /* One --enemy-<id> per enemy in content/enemies.kdl. */
+  --enemy-crawler: #ff4d4d;
+  --enemy-spitter: #5dff8f;
+  --enemy-charger: #ff9f1c;
+  --enemy-brute: #b45cff;
+
+  /* The look (view/look.ts): how the render sees the palette's hues, and how hard the juice hits. Plain numbers; the
+     unit is the name's last word (u = world units, s, deg, rad; u-s = units per second, u-s2 per second squared); no unit is a strength. */
   /* Tone-mapping exposure: the whole frame. */
-  --look-exposure: 1.1;
+  --look-exposure: 1.15;
   /* The key light's strength, and where it shines from (x y z towards it). */
-  --look-key-light: 2.2;
-  --look-key-dir: 3 8 4;
+  --look-key-light: 2.4;
+  --look-key-dir: -4 10 6;
   /* Sky/ground fill, so the unlit side isn't black. */
-  --look-fill-light: 0.8;
-  /* Camera: field of view, distance from the field's centre, and tilt off straight down. */
-  --look-camera-fov-deg: 40;
-  --look-camera-dist-u: 14;
-  --look-camera-tilt-rad: 0.35;
+  --look-fill-light: 0.9;
+  /* How brightly enemies glow in their own colour (0: not at all, 1: flat colour). */
+  --look-glow: 0.35;
+  /* Camera: field of view, tilt off straight down, how much room round the arena (1: edge to edge), and how far
+     below the arena's centre it looks, so the arena sits above the hand of cards. */
+  --look-camera-fov-deg: 38;
+  --look-camera-tilt-rad: 0.32;
+  --look-camera-margin: 1.34;
+  --look-camera-lift-u: 2.3;
+  /* Hit flash: how long a struck enemy shows white, and how bright. */
+  --look-flash-s: 0.08;
+  --look-flash-glow: 1.5;
+  /* Kill burst: bits flung out, how fast, how hard they fall back, how long they last. */
+  --look-burst-bits: 14;
+  --look-burst-speed-u-s: 7;
+  --look-burst-gravity-u-s2: 18;
+  --look-burst-s: 0.55;
+  /* Enemies: how fast gems and orbs turn, how long a new one takes to grow in, how hard a charger shakes in its windup. */
+  --look-spin-rad-s: 1.5;
+  --look-spawn-grow-s: 0.25;
+  --look-windup-shake-u: 0.25;
+  /* Screen shake when the pilot is hurt: how far, how long. */
+  --look-shake-u: 0.35;
+  --look-shake-s: 0.3;
 }
 
 text { font-family: var(--body-font); font-color: var(--text); font-size: 16px }
@@ -48,3 +100,33 @@ button:pressed { scale: .94 }
 button.primary { border-color: var(--accent) }
 button.off { opacity: .45 }
 .shared-btn-label { font-family: var(--title-font); font-size: 16px; letter-spacing: 3px; font-color: var(--text) }
+
+/* A card: cost in the corner, name, what it does, and its key. The frame's colour says its kind; `off` when you
+   can't pay for it. */
+button.card {
+  width: 128px; height: 76px; padding: 5px 8px; gap: 2px; align-items: stretch; justify-content: flex-start;
+  border-width: 2px; transition: scale .1s ease-out, opacity .15s, translate .15s ease-out;
+}
+button.card:hover { translate: 0 -6px }
+.card.attack { border-color: var(--kind-attack) }
+.card.move { border-color: var(--kind-move) }
+.card.power { border-color: var(--kind-power) }
+.card.off { opacity: .4 }
+.card-top { flex-direction: row; align-items: center; gap: 6px }
+.card-cost { font-family: var(--title-font); font-size: 16px; font-color: var(--energy) }
+.card-name { font-family: var(--title-font); font-size: 13px; letter-spacing: 1px }
+.card-text { font-size: 11px; line-height: 13px; font-color: var(--dim); text-wrap: wrap; width: 100%; flex-grow: 1 }
+.card-hotkey { font-size: 10px; font-color: var(--dim); text-align: right; width: 100% }
+
+/* A line of text in a dialog's body. */
+.shared-line { font-size: 14px; letter-spacing: 1px; font-color: var(--dim); text-align: center }
+
+/* A dialog over the arena: the dimmed arena behind, a title, a line, its body (cards, lines) and its buttons. */
+.dialog { width: 100%; height: 100%; align-items: center; justify-content: center; gap: 12px; pointer-events: auto }
+.dialog-scrim { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: var(--scrim); opacity: .72 }
+.dialog-title { font-family: var(--title-font); font-size: 30px; letter-spacing: 8px; font-color: var(--accent); animation: dialog-in .45s var(--pop) }
+@keyframes dialog-in { from { opacity: 0; scale: .7 } }
+.dialog-sub { font-size: 13px; letter-spacing: 3px; font-color: var(--dim) }
+.dialog-body { gap: 4px; align-items: center; justify-content: center }
+.dialog-body.row { flex-direction: row; gap: 14px }
+.dialog-buttons { flex-direction: row; gap: 14px }

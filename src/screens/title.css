@@ -1,11 +1,11 @@
-/* The title screen (title.kdl), over the 3D scene. Sizes are design px, times in s. */
-.title { width: 100%; height: 100%; align-items: center; justify-content: space-between; padding: 14px 0 12px 0 }
-.title-top, .title-bottom { align-items: center; gap: 8px }
-.title-name { font-family: var(--title-font); font-size: 32px; letter-spacing: 10px; animation: title-in .8s var(--pop) }
+/* The title screen (title.kdl), over the arena. Sizes are design px, times in s. */
+.title { width: 100%; height: 100%; align-items: center; justify-content: space-between; padding: 30px 0 26px 0; pointer-events: auto }
+.title-scrim { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: var(--scrim); opacity: .55 }
+.title-top, .title-bottom, .title-how { align-items: center; gap: 8px }
+.title-name { font-family: var(--title-font); font-size: 52px; letter-spacing: 16px; font-color: var(--accent); animation: title-in .8s var(--pop) }
 @keyframes title-in { from { opacity: 0; scale: .6 } }
-.title-score { font-family: var(--title-font); font-size: 14px; letter-spacing: 4px; font-color: var(--accent) }
-/* What's left of the batch: a thin bar under the score. */
-.title-left { width: 160px; height: 5px; background-color: var(--panel); border-color: var(--edge); border-width: 1px }
-.title-left-fill { width: 100%; height: 100%; tint: var(--accent) }
+.title-tag { font-size: 13px; letter-spacing: 5px; font-color: var(--dim) }
+.title-how { gap: 6px }
+.title-line { font-size: 12px; letter-spacing: 1px }
 .title-buttons { flex-direction: row; gap: 14px }
-.title-best { font-size: 12px; font-color: var(--dim) }
+.title-best { font-size: 12px; letter-spacing: 2px; font-color: var(--dim) }

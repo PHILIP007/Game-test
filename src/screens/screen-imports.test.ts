@@ -27,7 +27,7 @@ import { describe, expect, it } from 'vitest'
  * shared.ts is the one place game-wide registrations (and their pixi drawing) live, so it is exempt.
  */
 const CORE = [
-  'game', 'rewards', 'content', 'content-load', 'tuning', 'rng',
+  'game', 'rewards', 'content', 'content-load', 'tuning', 'rng', 'world', 'cards', 'enemies',
 ] // mirrors CORE in src/core-purity.test.ts
 
 const RAW = import.meta.glob<string>(['./*.ts', '!./shared.ts', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true })

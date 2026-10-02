@@ -1,0 +1,45 @@
+// The enemies.
+//   enemy "id" name="Shown name" hp=<health> r=<radius, u> touch=<damage on contact> paint="--token" shape="spike|block|gem|orb" {
+//       enemy words, one per line: how it moves and attacks, then what it drops when killed
+//   }
+// `paint` is a palette token in src/screens/shared.css :root; `shape` is its mesh (src/view/scene.ts).
+// Enemy words (src/enemies.ts, catalog ## Behaviour words); speeds in u/s, the pilot runs at 7:
+//   chase speed                   walk straight at the pilot
+//   orbit range_u speed           keep about range_u away and circle
+//   lunge every_s speed           every few seconds: stop, shake, then dash at the pilot
+//   shoot every_s speed           every few seconds: one shot at the pilot
+//   spray n every_s speed         every few seconds: n shots in a ring
+// Drop words (src/rewards.ts):
+//   score n                       n points
+//   energy n                      n energy
+//   heal n                        n health
+
+// Fast, fragile, comes in swarms. The thing you learn to fan away.
+enemy "crawler" name="Crawler" hp=2 r=0.4 touch=1 paint="--enemy-crawler" shape="spike" {
+    chase 3.6
+    score 10
+}
+
+// Keeps its distance and shoots. Dash in, or rail it from afar.
+enemy "spitter" name="Spitter" hp=3 r=0.45 touch=1 paint="--enemy-spitter" shape="gem" {
+    orbit 7 2.6
+    shoot 2.2 7
+    score 20
+}
+
+// Ambles, then stops and shakes: that's your cue to move before it lunges.
+enemy "charger" name="Charger" hp=5 r=0.55 touch=2 paint="--enemy-charger" shape="block" {
+    chase 1.6
+    lunge 3.2 15
+    score 30
+    energy 1
+}
+
+// Slow and huge; sprays a ring of shots. Worth a whole hand.
+enemy "brute" name="Brute" hp=18 r=0.95 touch=2 paint="--enemy-brute" shape="orb" {
+    chase 1.1
+    spray 10 3.5 5
+    score 80
+    energy 2
+    heal 1
+}

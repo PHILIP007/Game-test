@@ -9,6 +9,9 @@ import runtimeTs from './runtime.ts?raw';
 import contentLoadTs from './content-load.ts?raw';
 import kitPy from '../models/kit.py?raw';
 import { PROPS } from './decl/css';
+import { EFFECTS } from './cards';
+import { CARD_KINDS, SHAPES } from './content';
+import { BEHAVIOURS } from './enemies';
 import { REWARDS } from './rewards';
 import { TOKENS } from './tokens';
 import { LOOK_KEYS, lookToken } from './view/look';
@@ -32,7 +35,13 @@ describe('the catalog matches the code', () => {
   it('palette', () => same('Palette', Object.keys(TOKENS).filter((k) => !k.startsWith('--look-'))));
   it('look', () => same('Look', looks));
   it('every look token is read by the shell', () => expect(LOOK_KEYS.map(lookToken).sort()).toEqual([...looks].sort()));
-  it('behaviour words', () => same('Behaviour words', Object.keys(REWARDS)));
+  it('behaviour words', () => same('Behaviour words', [...Object.keys(EFFECTS), ...Object.keys(BEHAVIOURS), ...Object.keys(REWARDS)]));
+  it('behaviour words are unique across registries (enemy and drop words share a node)', () => {
+    const names = [...Object.keys(EFFECTS), ...Object.keys(BEHAVIOURS), ...Object.keys(REWARDS)];
+    expect(names.length).toBe(new Set(names).size);
+  });
+  it('card kinds', () => same('Card kinds', [...CARD_KINDS]));
+  it('enemy shapes', () => same('Enemy shapes', [...SHAPES]));
   it('content kinds', () => same('Content kinds', all(contentTs, /loadKdl\(\w+, \{ ([^}]+) \}/g).flatMap((kinds) => kinds.split(',').map((k) => k.split(':')[0]!.trim()))));
   it('content helpers', () => same('Content helpers', all(contentLoadTs, /^export function (\w+)/gm)));
   it('modelling kit', () => same('Modelling kit', all(kitPy, /^def ([a-z]\w*)\(/gm)));
