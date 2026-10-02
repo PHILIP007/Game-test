@@ -35,6 +35,12 @@ npx playwright install chromium   # once per machine, for the story tests
 npm run dev
 ```
 
+## Deploy
+
+`.github/workflows/pages.yml` runs the unit tests, builds, and publishes `dist/` to GitHub Pages on every push to the
+default branch (or by hand: Actions > Deploy to GitHub Pages > Run workflow). One-time setup: Settings > Pages >
+Source: **GitHub Actions**. The game is then at `https://<owner>.github.io/<repo>/`.
+
 ## Commands
 
 | Command | What it does |
