@@ -1,6 +1,6 @@
 // Everything whose lifetime is the game's starts here and is torn down by the disposer boot() returns: the two
 // canvases, the clock and the fight's step on it, the controls, the store subscriptions that draw the screens and
-// the arena, and resize handling.
+// the basement, and resize handling.
 import { UPDATE_PRIORITY } from 'pixi.js';
 import * as Actions from './actions';
 import { onTick, startClock } from './clock';

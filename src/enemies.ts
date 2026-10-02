@@ -4,7 +4,7 @@
 import { T } from './tuning';
 import { clampToArena, dist, fan, rotate, toward, unit, type Enemy, type GameEvent, type ShotSpec, type Vec } from './world';
 
-/** What a step gives a behaviour word: where the pilot is, and how much time passed. */
+/** What a step gives a behaviour word: where the kid is, and how much time passed. */
 export type Ctx = { target: Vec; dtS: number };
 /** A word's step: the enemy after it, shots it fired, and what happened. */
 export type Act = { e: Enemy; shots: ShotSpec[]; events: GameEvent[] };
@@ -22,11 +22,11 @@ const foeShot = (from: Vec, dir: Vec, speed: number): ShotSpec =>
   ({ at: { x: from.x, y: from.y }, dir, speed, damage: T.FOE_SHOT_DAMAGE, r: T.FOE_SHOT_R_U, lifeS: T.FOE_SHOT_LIFE_S });
 
 export const BEHAVIOURS: Record<string, (...args: number[]) => Behaviour> = {
-  /** `chase speed_u_s`: walk straight at the pilot. */
+  /** `chase speed_u_s`: walk straight at the kid. */
   chase: (speed) => behaviour((e, { target, dtS }) =>
     quiet(e.mode === 'walk' ? walk(e, scale(toward(e, target), speed), dtS) : e)),
 
-  /** `orbit range_u speed_u_s`: keep about range_u away and circle the pilot. */
+  /** `orbit range_u speed_u_s`: keep about range_u away and circle the kid. */
   orbit: (range, speed) => behaviour((e, { target, dtS }) => {
     if (e.mode !== 'walk') return quiet(e);
     const d = dist(e, target), inward = toward(e, target);
@@ -35,7 +35,7 @@ export const BEHAVIOURS: Record<string, (...args: number[]) => Behaviour> = {
     return quiet(walk(e, scale(unit({ x: inward.x * radial + side.x * 0.8, y: inward.y * radial + side.y * 0.8 }), speed), dtS));
   }),
 
-  /** `lunge every_s speed_u_s`: every few seconds, stop and shake (the windup), then dash at where the pilot was. */
+  /** `lunge every_s speed_u_s`: every few seconds, stop and shake (the windup), then dash at where the kid was. */
   lunge: (everyS, speed) => behaviour((e, { target, dtS }) => {
     if (e.mode === 'walk') {
       const t = timer(e, 'lunge', everyS, dtS);
@@ -48,7 +48,7 @@ export const BEHAVIOURS: Record<string, (...args: number[]) => Behaviour> = {
     return quiet(modeS > 0 ? { ...moved, modeS } : { ...moved, mode: 'walk', modeS: 0 });
   }),
 
-  /** `shoot every_s speed_u_s`: every few seconds, one shot at the pilot. */
+  /** `shoot every_s speed_u_s`: every few seconds, one shot at the kid. */
   shoot: (everyS, speed) => behaviour((e, { target, dtS }) => {
     const t = timer(e, 'shoot', everyS, dtS);
     return { e: t.e, shots: t.ready && e.mode === 'walk' ? [foeShot(e, toward(e, target), speed)] : [], events: [] };

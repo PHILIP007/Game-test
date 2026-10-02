@@ -1,15 +1,15 @@
-// The shop after a cleared wave, over the dimmed arena: the title and your points; the weapons on offer, one to buy
-// (buying starts the next wave); your mounts, any of which you can sell first to free a mount or raise points; and a
-// button to move on without buying. Styled with the shared dialog classes (shared.css) and shop.css; bound in shop.ts.
+// The shop after a cleared wave, over the dimmed basement: the title and your pennies; what's on offer, one thing to
+// swallow (that starts the next wave); your stomach, anything in which you can cough up first to free a slot or for
+// pennies; and a button to move on without buying. Styled with the shared dialog classes (shared.css) and shop.css; bound in shop.ts.
 prefab "shop" {
     panel class="dialog" {
         panel class="dialog-scrim"
         text class="shop-title" bind="title"
-        text class="shop-points" bind="points"
-        text class="dialog-sub" "BUY ONE WEAPON  ·  MOUNT 1 FIRES BY ITSELF, THE REST WHEN YOU CALL THEM"
+        text class="shop-pennies" bind="pennies"
+        text class="dialog-sub" "SWALLOW ONE  ·  SLOT 1 SPITS BY ITSELF, THE REST WHEN YOU CALL THEM"
         panel class="shop-row" slot="offer"
-        text class="dialog-sub" "YOUR MOUNTS  ·  TAP ONE TO SELL IT"
-        panel class="shop-row" slot="mounts"
+        text class="dialog-sub" "YOUR STOMACH  ·  TAP ONE TO COUGH IT UP"
+        panel class="shop-row" slot="stomach"
         panel class="dialog-buttons" slot="buttons"
     }
 }

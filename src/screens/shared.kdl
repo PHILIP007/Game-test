@@ -9,7 +9,7 @@ prefab "btn" {
 }
 
 // A weapon from content/weapons.kdl: weapon(id, tap, { key, tag, charge, foot, off?, ready? }) in shared.ts. Its kind
-// (gun, support), `off` and `ready` become classes; with no tap (an automatic mount) it can't be pressed.
+// (attack, defend), `off` and `ready` become classes; with no tap (the automatic slot) it can't be pressed.
 prefab "weapon" {
     button class="weapon" bind-class="state" tap="tap" {
         panel class="weapon-top" {
@@ -24,10 +24,10 @@ prefab "weapon" {
     }
 }
 
-// A mount with nothing in it, the size of a weapon tile: emptyMount(key) in shared.ts.
-prefab "mount-empty" {
-    panel class="mount-empty" {
-        text class="mount-empty-label" "EMPTY MOUNT"
+// A stomach slot with nothing in it, the size of a weapon tile: emptySlot(key) in shared.ts.
+prefab "slot-empty" {
+    panel class="slot-empty" {
+        text class="slot-empty-label" "NOTHING SWALLOWED"
     }
 }
 
@@ -36,7 +36,7 @@ prefab "line" {
     text class="shared-line" bind="text"
 }
 
-// A dialog over the dimmed arena: dialog(title, sub, body, buttons, layout?) in shared.ts. It swallows taps, so
+// A dialog over the dimmed basement: dialog(title, sub, body, buttons, layout?) in shared.ts. It swallows taps, so
 // nothing behind it can be pressed. `layout` is the body's class: a column of lines, or a `row` of tiles.
 prefab "dialog" {
     panel class="dialog" {

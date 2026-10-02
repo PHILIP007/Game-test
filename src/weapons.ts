@@ -14,9 +14,9 @@ export const EFFECTS: Record<string, (...args: number[]) => Effect> = {
   /** `volley n spread_deg damage`: n shots fanned across spread_deg along your aim (n 1: one straight shot). */
   volley: (n, spreadDeg, damage) => (s, weapon) =>
     fire(s, { weapon }, fan(s.player.aim, n, spreadDeg).map((dir) => ({ dir, speed: T.SHOT_SPEED_U_S, damage }))),
-  /** `rail damage`: one fast slug along your aim that goes through everything. */
-  rail: (damage) => (s, weapon) =>
-    fire(s, { weapon }, [{ dir: s.player.aim, speed: T.RAIL_SPEED_U_S, damage, pierce: true, r: T.SHOT_R_U * 1.5 }]),
+  /** `pierce damage`: one fast shot along your aim that goes through everything. */
+  pierce: (damage) => (s, weapon) =>
+    fire(s, { weapon }, [{ dir: s.player.aim, speed: T.PIERCE_SPEED_U_S, damage, pierce: true, r: T.SHOT_R_U * 1.5 }]),
   /** `nova n damage`: n shots in a ring all round you. */
   nova: (n, damage) => (s, weapon) =>
     fire(s, { weapon }, fan(s.player.aim, n, 360).map((dir) => ({ dir, speed: T.SHOT_SPEED_U_S * 0.8, damage }))),

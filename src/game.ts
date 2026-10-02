@@ -2,7 +2,7 @@
 // here touches the renderer, the store, the DOM or storage (src/core-purity.test.ts holds that line). Each transition
 // leaves `events` describing what just happened, and the shell animates from those.
 //
-// A run: waves of enemies come in from the arena's edge (content/waves.kdl). The pilot carries weapons in mounts
+// A run: waves of enemies come in from the arena's edge (content/waves.kdl). The kid carries weapons in mounts
 // (content/weapons.kdl), each on its own cooldown: the first mount fires at the cursor by itself, the others when
 // you call them (fireWeapon) once they're ready. Kills pay points; clear a wave and
 // the shop offers weapons to buy with them, and buys back the ones you carry.
@@ -15,7 +15,7 @@ import { clampToArena, dist, fire, inArena, toward, unit, type Enemy, type GameE
 
 export type { GameState, GameEvent, Enemy, Mount, Shot, Vec } from './world';
 
-/** What the pilot asks for this step: a move direction (length up to 1) and the world point the cursor is over. */
+/** What the kid asks for this step: a move direction (length up to 1) and the world point the cursor is over. */
 export type Input = { move: Vec; aim: Vec };
 export const IDLE: Input = { move: { x: 0, y: 0 }, aim: { x: 1, y: 0 } };
 
@@ -23,7 +23,7 @@ export const IDLE: Input = { move: { x: 0, y: 0 }, aim: { x: 1, y: 0 } };
 export const waveDef = (wave: number) => ({ def: WAVES[(wave - 1) % WAVES.length]!, lap: Math.floor((wave - 1) / WAVES.length) });
 
 export function newGame(seed: number): GameState {
-  const mounts: Mount[] = Array.from({ length: T.MOUNTS }, (_, i) => ({ weapon: STARTING_WEAPONS[i] ?? '', cooldownS: 0 }));
+  const mounts: Mount[] = Array.from({ length: T.STOMACH_SLOTS }, (_, i) => ({ weapon: STARTING_WEAPONS[i] ?? '', cooldownS: 0 }));
   const s: GameState = {
     seed, phase: 'fight', wave: 0, queue: [], spawnS: 0,
     player: { x: 0, y: 0, hp: T.PLAYER_HP, aim: { x: 1, y: 0 }, graceS: 0, shieldS: 0 },
@@ -68,8 +68,8 @@ function movePilot(s: GameState, dtS: number, { move, aim }: Input): GameState {
   return { ...s, player: { ...p, ...at, aim: dist(at, aim) > 0.05 ? toward(at, aim) : p.aim, graceS: down(p.graceS), shieldS: down(p.shieldS) } };
 }
 
-/** Whether the weapon in mount `i` fires by itself (the first AUTO_MOUNTS) rather than when you call it. */
-export const isAuto = (i: number) => i < T.AUTO_MOUNTS;
+/** Whether the weapon in mount `i` fires by itself (the first AUTO_SLOTS) rather than when you call it. */
+export const isAuto = (i: number) => i < T.AUTO_SLOTS;
 
 /** A weapon goes off: its words run and its cooldown starts again. */
 function shoot(s: GameState, i: number): GameState {
@@ -107,7 +107,7 @@ function spawn(s: GameState, dtS: number): GameState {
   const spawnS = s.spawnS - dtS;
   if (spawnS > 0 || !s.queue.length) return { ...s, spawnS };
   const rng: Rng = { seed: s.seed }, kind = s.queue[0]!, d = enemyDef(kind), { def, lap } = waveDef(s.wave);
-  const hw = T.ARENA_W_U / 2 - T.SPAWN_INSET_U, hh = T.ARENA_H_U / 2 - T.SPAWN_INSET_U, along = rand(rng) * 2 - 1;
+  const hw = T.FLOOR_W_U / 2 - T.SPAWN_INSET_U, hh = T.FLOOR_H_U / 2 - T.SPAWN_INSET_U, along = rand(rng) * 2 - 1;
   const side = pick(rng, [0, 1, 2, 3]);
   const at = side === 0 ? { x: -hw, y: along * hh } : side === 1 ? { x: hw, y: along * hh } : side === 2 ? { x: along * hw, y: -hh } : { x: along * hw, y: hh };
   const hp = d.hp * (1 + lap * T.LAP_HP_STEP);
@@ -142,7 +142,7 @@ function moveShots(s: GameState, dtS: number): GameState {
   return { ...s, shots };
 }
 
-/** Shots against enemies and the pilot, and enemies against the pilot. Kills pay out their drop words. */
+/** Shots against enemies and the kid, and enemies against the kid. Kills pay out their drop words. */
 function collide(s: GameState): GameState {
   const events: GameEvent[] = [...s.events];
   const hp = new Map(s.enemies.map((e) => [e.id, e.hp]));
@@ -179,7 +179,7 @@ function collide(s: GameState): GameState {
   return pilotDamage ? hurt(n, pilotDamage) : n;
 }
 
-/** The pilot takes `damage`, unless still untouchable from the last hit, a dash or a shield. */
+/** The kid takes `damage`, unless still untouchable from the last hit, a dash or a shield. */
 function hurt(s: GameState, damage: number): GameState {
   if (s.player.graceS > 0) return s;
   return { ...s, player: { ...s.player, hp: s.player.hp - damage, graceS: T.HURT_GRACE_S }, events: [...s.events, { type: 'hurt', damage }] };

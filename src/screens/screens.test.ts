@@ -24,23 +24,23 @@ describe('screens render from the stores', () => {
   it('title', () => {
     game.setState({ meta: { best: 99, bestWave: 4, runs: 2 } });
     const t = show(newGame(1));
-    expect(t).toContain('DECKFIRE');
+    expect(t).toContain('GOB');
     expect(t).toContain('BEST 99  ·  FURTHEST WAVE 4  ·  2 RUNS');
     expect(t).not.toContain('WAVE 1');
   });
-  it('hud: wave, points, score, the mounts', () => {
+  it('hud: wave, pennies, score, the slots', () => {
     const s = { ...newGame(1), points: 70, score: 120 };
     const t = show(s, { screen: 'run' });
-    expect(t).toEqual(expect.arrayContaining(['WAVE 1', '70 PTS', 'SCORE 120', 'BLASTER', 'One shot at the cursor', 'EMPTY MOUNT']));
-    expect(t).not.toContain('DECKFIRE');
+    expect(t).toEqual(expect.arrayContaining(['WAVE 1', '70¢', 'SCORE 120', 'SPIT', 'A gob of spit at the cursor', 'NOTHING SWALLOWED']));
+    expect(t).not.toContain('GOB');
   });
-  it('shop: offers with prices, mounts to sell, move on', () => {
-    expect(show({ ...newGame(1), phase: 'shop', points: 60, offer: ['scatter', 'rail', 'medic'] }, { screen: 'run' }))
-      .toEqual(expect.arrayContaining(['WAVE 1 CLEARED', '60 POINTS TO SPEND', 'SCATTER', '60 PTS', 'BUY', 'NOT ENOUGH POINTS', 'REPAIR DRONE', 'LAST WEAPON', 'NEXT WAVE']));
+  it('shop: offers with prices, slots to sell, move on', () => {
+    expect(show({ ...newGame(1), phase: 'shop', points: 60, offer: ['chunks', 'tooth', 'lick'] }, { screen: 'run' }))
+      .toEqual(expect.arrayContaining(['WAVE 1 SURVIVED', '60¢ TO SPEND', 'CHUNKS', '60¢', 'SWALLOW', 'NOT ENOUGH PENNIES', 'LICK WOUNDS', "ALL YOU'VE GOT", 'NEXT WAVE']));
     expect(texts()).not.toContain('HULL'); // the HUD steps aside for the shop
   });
   it('game over', () => {
-    expect(show({ ...newGame(1), phase: 'dead', wave: 5 }, { screen: 'run' })).toContain('YOU FELL ON WAVE 5');
+    expect(show({ ...newGame(1), phase: 'dead', wave: 5 }, { screen: 'run' })).toContain('THE BASEMENT GOT YOU ON WAVE 5');
   });
   it('pause', () => {
     expect(show(newGame(1), { screen: 'run', paused: true })).toEqual(expect.arrayContaining(['PAUSED', 'RESUME', 'QUIT']));

@@ -5,7 +5,7 @@ import * as Actions from '../actions';
 import { canFire, isAuto, readiness } from '../game';
 import { game, ui } from '../store';
 import { T } from '../tuning';
-import { emptyMount, screenUi, weapon } from './shared';
+import { emptySlot, screenUi, weapon } from './shared';
 import hudKdl from './hud.kdl?raw';
 import hudCss from './hud.css?raw';
 
@@ -20,18 +20,18 @@ export function drawHud() {
   if (screen !== 'run' || run.phase === 'shop') return hudUi.show(null); // the shop shows the points and mounts itself
   const p = run.player;
   hudUi.show(use('hud', {
-    hull: p.hp / T.PLAYER_HP,
-    hullText: `${p.hp}/${T.PLAYER_HP}`,
+    hearts: p.hp,
+    maxHearts: T.PLAYER_HP,
     wave: `WAVE ${run.wave}`,
-    points: `${run.points} PTS`,
+    pennies: `${run.points}¢`,
     score: `SCORE ${run.score}`,
   }, {
-    mounts: run.mounts.map((m, i) => {
-      if (!m.weapon) return emptyMount(`mount${i}`);
+    slots: run.mounts.map((m, i) => {
+      if (!m.weapon) return emptySlot(`slot${i}`);
       const tag = `${weaponDef(m.weapon).cooldownS}s`, charge = Math.floor(readiness(m) * BAR_STEPS) / BAR_STEPS;
-      if (isAuto(i)) return weapon(m.weapon, undefined, { key: `mount${i}`, tag, charge, foot: 'AUTO' });
+      if (isAuto(i)) return weapon(m.weapon, undefined, { key: `slot${i}`, tag, charge, foot: 'AUTO' });
       const ready = canFire(run, i);
-      return weapon(m.weapon, () => Actions.fireWeapon(i), { key: `mount${i}`, tag, charge, foot: ready ? `READY · PRESS ${i + 1}` : `KEY ${i + 1}`, ready });
+      return weapon(m.weapon, () => Actions.fireWeapon(i), { key: `slot${i}`, tag, charge, foot: ready ? `READY · PRESS ${i + 1}` : `KEY ${i + 1}`, ready });
     }),
   }));
 }

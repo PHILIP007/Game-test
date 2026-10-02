@@ -15,11 +15,11 @@ describe('a new run', () => {
   it('is the same for the same seed', () => {
     expect(newGame(7)).toEqual(newGame(7));
   });
-  it('starts on wave 1 with the blaster mounted, the other mounts empty, no points', () => {
+  it('starts on wave 1 with the spit swallowed, the other slots empty, no pennies', () => {
     const s = newGame(3);
     expect(s.wave).toBe(1);
     expect(s.phase).toBe('fight');
-    expect(s.mounts.map((m) => m.weapon)).toEqual(['blaster', ...Array(T.MOUNTS - 1).fill('')]);
+    expect(s.mounts.map((m) => m.weapon)).toEqual(['spit', ...Array(T.STOMACH_SLOTS - 1).fill('')]);
     expect(s.points).toBe(0);
     expect(s.queue).toEqual(WAVES[0]!.queue);
   });
@@ -31,71 +31,71 @@ describe('the fight', () => {
     expect(s.enemies).toHaveLength(1);
     const e = s.enemies[0]!;
     expect(e.kind).toBe(WAVES[0]!.queue[0]);
-    expect(Math.abs(e.x) > T.ARENA_W_U / 2 - 1 || Math.abs(e.y) > T.ARENA_H_U / 2 - 1).toBe(true);
+    expect(Math.abs(e.x) > T.FLOOR_W_U / 2 - 1 || Math.abs(e.y) > T.FLOOR_H_U / 2 - 1).toBe(true);
   });
-  it('the weapon in mount 1 fires at the cursor by itself, then waits out its cooldown', () => {
-    let s = arena([foe('crawler', -8, 6)]);
+  it('the thing in slot 1 fires at the cursor by itself, then waits out its cooldown', () => {
+    let s = arena([foe('fly', -8, 6)]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
     expect(s.shots).toHaveLength(1);
     expect(s.shots[0]!.v.y).toBeGreaterThan(0);
-    expect(s.events).toContainEqual({ type: 'fired', from: { weapon: 'blaster' } });
-    expect(s.mounts[0]!.cooldownS).toBeCloseTo(WEAPONS.blaster!.cooldownS);
+    expect(s.events).toContainEqual({ type: 'fired', from: { weapon: 'spit' } });
+    expect(s.mounts[0]!.cooldownS).toBeCloseTo(WEAPONS.spit!.cooldownS);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
     expect(s.shots).toHaveLength(1);
   });
-  const armed = () => arena([foe('crawler', -8, 6)], { mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'rail', cooldownS: 0 }, { weapon: 'scatter', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
-  it('the other mounts never fire by themselves: they wait, ready, to be called', () => {
+  const armed = () => arena([foe('fly', -8, 6)], { mounts: [{ weapon: 'spit', cooldownS: 0 }, { weapon: 'tooth', cooldownS: 0 }, { weapon: 'chunks', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
+  it('the other slots never fire by themselves: they wait, ready, to be called', () => {
     const s = run(armed(), 2, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
-    expect(s.shots.some((b) => b.from !== 'foe' && b.from.weapon !== 'blaster')).toBe(false);
+    expect(s.shots.some((b) => b.from !== 'foe' && b.from.weapon !== 'spit')).toBe(false);
     expect(canFire(s, 1)).toBe(true);
-    expect(canFire(s, 0)).toBe(false); // mount 1 is automatic
+    expect(canFire(s, 0)).toBe(false); // slot 1 is automatic
   });
-  it('calling a ready weapon fires it and starts its own cooldown; called again too soon, nothing happens', () => {
+  it('calling a ready thing fires it and starts its own cooldown; called again too soon, nothing happens', () => {
     let s = fireWeapon(step(armed(), STEP_S, IDLE), 1);
-    expect(s.events).toEqual([{ type: 'fired', from: { weapon: 'rail' } }]);
-    expect(s.mounts[1]!.cooldownS).toBe(WEAPONS.rail!.cooldownS);
+    expect(s.events).toEqual([{ type: 'fired', from: { weapon: 'tooth' } }]);
+    expect(s.mounts[1]!.cooldownS).toBe(WEAPONS.tooth!.cooldownS);
     expect(fireWeapon(s, 1)).toBe(s);
-    s = run(s, WEAPONS.rail!.cooldownS + STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
+    s = run(s, WEAPONS.tooth!.cooldownS + STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(canFire(s, 1)).toBe(true);
-    expect(fireWeapon(s, 3)).toBe(s); // an empty mount
+    expect(fireWeapon(s, 3)).toBe(s); // an empty slot
   });
-  it('a called weapon can be fired into an empty arena (it\'s your call); the automatic one holds its fire', () => {
-    const s = step(arena([], { queue: ['crawler'] , spawnS: 9 , mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'nova', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] }), STEP_S, IDLE);
+  it('a called thing can be fired into an empty basement (it\'s your call); the automatic one holds its fire', () => {
+    const s = step(arena([], { queue: ['fly'] , spawnS: 9 , mounts: [{ weapon: 'spit', cooldownS: 0 }, { weapon: 'burp', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] }), STEP_S, IDLE);
     expect(s.events.some((e) => e.type === 'fired')).toBe(false);
     expect(fireWeapon(s, 1).shots.length).toBeGreaterThan(0);
   });
-  it('the pilot moves, and the walls stop it', () => {
+  it('the kid moves, and the walls stop it', () => {
     const s = run(newGame(1), 10, { move: { x: 1, y: 0 }, aim: { x: 0, y: 0 } });
-    expect(s.player.x).toBeCloseTo(T.ARENA_W_U / 2 - T.PLAYER_R_U);
+    expect(s.player.x).toBeCloseTo(T.FLOOR_W_U / 2 - T.PLAYER_R_U);
   });
-  it('a crawler walks at the pilot and hurts on contact, then the pilot is briefly untouchable', () => {
-    let s = arena([foe('crawler', 3, 0)]);
-    s = run(s, 1, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } }); // aim away so the blaster misses
-    expect(s.player.hp).toBe(T.PLAYER_HP - ENEMIES.crawler!.touch);
+  it('a fly walks at the kid and hurts on contact, then the kid is briefly untouchable', () => {
+    let s = arena([foe('fly', 3, 0)]);
+    s = run(s, 1, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } }); // aim away so the spit misses
+    expect(s.player.hp).toBe(T.PLAYER_HP - ENEMIES.fly!.touch);
     expect(s.player.graceS).toBeGreaterThan(0);
   });
-  it('shots kill, and kills pay points (which count towards the score)', () => {
-    let s = arena([foe('crawler', 4, 0, { hp: 1 }), foe('crawler', -8, 6, { id: 901 })]);
+  it('shots kill, and kills pay pennies (which count towards the score)', () => {
+    let s = arena([foe('fly', 4, 0, { hp: 1 }), foe('fly', -8, 6, { id: 901 })]);
     s = run(s, 0.5, { move: { x: 0, y: 0 }, aim: { x: 4, y: 0 } });
     expect(s.kills).toBe(1);
     expect(s.points).toBe(10);
     expect(s.score).toBe(10);
   });
-  it('a charger winds up, then lunges', () => {
-    let s = arena([foe('charger', 8, 0, { timers: { lunge: 0.01 } })]);
+  it('a squealer winds up, then lunges', () => {
+    let s = arena([foe('squealer', 8, 0, { timers: { lunge: 0.01 } })]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.enemies[0]!.mode).toBe('windup');
     expect(s.events).toContainEqual({ type: 'windup', id: 900 });
     s = run(s, T.LUNGE_WINDUP_S + STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.enemies[0]!.mode).toBe('lunge');
   });
-  it('a spitter shoots at the pilot', () => {
-    let s = arena([foe('spitter', 6, 0, { timers: { shoot: 0.01 } })]);
+  it('a weeper shoots at the kid', () => {
+    let s = arena([foe('weeper', 6, 0, { timers: { shoot: 0.01 } })]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.shots.filter((b) => b.from === 'foe')).toHaveLength(1);
   });
-  it('a brute sprays a ring', () => {
-    let s = arena([foe('brute', 6, 0, { timers: { spray: 0.01 } })]);
+  it('a glutton sprays a ring', () => {
+    let s = arena([foe('glutton', 6, 0, { timers: { spray: 0.01 } })]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.shots.filter((b) => b.from === 'foe').length).toBeGreaterThan(5);
   });
@@ -104,7 +104,7 @@ describe('the fight', () => {
     expect(cleared.phase).toBe('shop');
     expect(cleared.offer).toHaveLength(T.OFFER_SIZE);
     expect(cleared.offer.every((w) => WEAPONS[w]!.price > 0)).toBe(true);
-    const dead = step(arena([foe('crawler', 0.2, 0)], { player: { ...newGame(1).player, hp: 1 } }), STEP_S, IDLE);
+    const dead = step(arena([foe('fly', 0.2, 0)], { player: { ...newGame(1).player, hp: 1 } }), STEP_S, IDLE);
     expect(dead.phase).toBe('dead');
     expect(dead.events.at(-1)).toEqual({ type: 'died' });
     expect(step(dead, STEP_S, IDLE)).toBe(dead);
@@ -112,45 +112,45 @@ describe('the fight', () => {
 });
 
 describe('the shop', () => {
-  const shop = (over: Partial<GameState> = {}): GameState => ({ ...step(arena([]), STEP_S, IDLE), offer: ['scatter', 'rail', 'nova'], ...over });
-  it('buying spends points, mounts the weapon in the first free mount, and starts the next wave', () => {
-    const s = shop({ points: 100 }), next = buy(s, 'rail');
-    expect(next.points).toBe(100 - WEAPONS.rail!.price);
-    expect(next.mounts[1]!.weapon).toBe('rail');
+  const shop = (over: Partial<GameState> = {}): GameState => ({ ...step(arena([]), STEP_S, IDLE), offer: ['chunks', 'tooth', 'burp'], ...over });
+  it('swallowing spends pennies, puts the thing in the first free slot, and starts the next wave', () => {
+    const s = shop({ points: 100 }), next = buy(s, 'tooth');
+    expect(next.points).toBe(100 - WEAPONS.tooth!.price);
+    expect(next.mounts[1]!.weapon).toBe('tooth');
     expect(next.wave).toBe(2);
     expect(next.phase).toBe('fight');
-    expect(next.events).toEqual([{ type: 'bought', weapon: 'rail', mount: 1 }]);
+    expect(next.events).toEqual([{ type: 'bought', weapon: 'tooth', mount: 1 }]);
   });
-  it('without the points, without a free mount, or off the offer, it is a no-op (same reference)', () => {
+  it('without the pennies, without a free slot, or off the offer, it is a no-op (same reference)', () => {
     const poor = shop({ points: 10 });
-    expect(cantBuy(poor, 'rail')).toBe('points');
-    expect(buy(poor, 'rail')).toBe(poor);
-    const full = shop({ points: 999, mounts: Array.from({ length: T.MOUNTS }, () => ({ weapon: 'blaster', cooldownS: 0 })) });
-    expect(cantBuy(full, 'rail')).toBe('mounts');
-    expect(buy(full, 'rail')).toBe(full);
-    expect(buy(shop({ points: 999 }), 'barrage')).toEqual(shop({ points: 999 }));
+    expect(cantBuy(poor, 'tooth')).toBe('points');
+    expect(buy(poor, 'tooth')).toBe(poor);
+    const full = shop({ points: 999, mounts: Array.from({ length: T.STOMACH_SLOTS }, () => ({ weapon: 'spit', cooldownS: 0 })) });
+    expect(cantBuy(full, 'tooth')).toBe('mounts');
+    expect(buy(full, 'tooth')).toBe(full);
+    expect(buy(shop({ points: 999 }), 'puke')).toEqual(shop({ points: 999 }));
   });
-  it('selling pays back part of the price and frees the mount; the shop stays open', () => {
-    const s = shop({ points: 0, mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'nova', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
+  it('coughing one up pays back part of the price and frees the slot; the shop stays open', () => {
+    const s = shop({ points: 0, mounts: [{ weapon: 'spit', cooldownS: 0 }, { weapon: 'burp', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
     const n = sell(s, 1);
-    expect(n.points).toBe(sellPrice('nova'));
-    expect(sellPrice('nova')).toBe(Math.floor(WEAPONS.nova!.price * T.SELL_BACK));
+    expect(n.points).toBe(sellPrice('burp'));
+    expect(sellPrice('burp')).toBe(Math.floor(WEAPONS.burp!.price * T.SELL_BACK));
     expect(n.mounts[1]!.weapon).toBe('');
     expect(n.phase).toBe('shop');
   });
-  it('the last weapon you carry can\'t be sold', () => {
+  it('the last thing in your stomach can\'t be coughed up', () => {
     const s = shop();
     expect(canSell(s, 0)).toBe(false);
     expect(sell(s, 0)).toBe(s);
   });
-  it('moving on keeps your points', () => {
+  it('moving on keeps your pennies', () => {
     const n = nextWave(shop({ points: 70 }));
     expect(n.wave).toBe(2);
     expect(n.points).toBe(70);
   });
-  it('weapon text quotes its own words and cooldown', () => {
-    expect(WEAPONS.scatter!.text).toBe('5 shots in a fan');
-    expect(WEAPONS.barrier!.text).toBe('Untouchable for 2s, every 9s');
+  it("a weapon's text quotes its own words and cooldown", () => {
+    expect(WEAPONS.chunks!.text).toBe('5 chunky gobs in a fan');
+    expect(WEAPONS.bubble!.text).toBe('Untouchable for 2s, every 9s');
   });
 });
 

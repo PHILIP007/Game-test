@@ -1,17 +1,19 @@
-# Deckfire
+# Gob
 
-A top-down arena shooter for the web. Waves of enemies pour in from the arena's edge. You carry up to four mounted
-weapons, each on its own cooldown. The one in mount 1 fires at the cursor by itself; the others charge up and wait
-for you to call them, so when you spend a slow rail, a nova ring or a barrier is up to you. Kills pay points; after
-each wave the shop offers three weapons to buy one of, and buys back the ones you carry for half their price.
+A gross-out top-down shooter for the web, in the spirit of Edmund McMillen's basement games (an original homage:
+none of his characters or art). You're a big-headed kid in a dim basement, and everything you fight with comes out
+of your mouth. Flies swarm you, weeping heads cry blood from a distance, squealing lumps charge, and the Glutton
+heaves rings of bile.
 
-**Controls:** WASD or arrows to move, the mouse aims, 2 3 4 (or a click on the tile) fires a ready weapon in that
-mount, Esc pauses.
+You can have up to four things swallowed, each on its own cooldown. Whatever's in slot 1 (spit, to start) spits at
+the cursor by itself; the others charge up and wait for you to call them: a loose tooth that goes through a whole
+line of them, a big burp all round you, projectile puke, a spit bubble, licking your wounds. Things drop pennies;
+after each wave the shop offers three things to swallow, and you can cough up what you've got for half its price.
 
-Enemies: the **crawler** swarms you, the **spitter** circles at range and shoots, the **charger** stops, shakes and
-lunges, and the **brute** is a slow, huge sponge that sprays rings of shots.
+**Controls:** WASD or arrows to move, the mouse aims, 2 3 4 (or a click on the tile) uses whatever's ready in that
+slot, Esc pauses.
 
-Built on the game-bible (`.claude/skills/game-bible`): TypeScript, Vite, Three for the arena, Pixi with a
+Built on the game-bible (`.claude/skills/game-bible`): TypeScript, Vite, Three for the basement (toon-shaded), Pixi with a
 declarative KDL/CSS dialect for the UI, zod-checked KDL content, a pure core with a seeded RNG, Storybook stories as
 tests.
 
@@ -19,11 +21,11 @@ tests.
 
 | Change | Home |
 |---|---|
-| A weapon: price, cooldown, what it fires, its text | `content/weapons.kdl` |
-| An enemy: health, size, how it moves and attacks, the points it pays | `content/enemies.kdl` |
+| Something to swallow: price, cooldown, what comes out, its text | `content/weapons.kdl` |
+| An enemy: health, size, body, how it moves and attacks, the pennies it drops | `content/enemies.kdl` |
 | What each wave sends, in what order, how fast | `content/waves.kdl` |
-| A number a rule reads (speeds, mounts, how many fire by themselves, offer size, sell-back) | `src/tuning.ts` |
-| Any colour, the camera, the light, the juice | `src/screens/shared.css` (`:root`) |
+| A number a rule reads (speeds, stomach slots, how many spit by themselves, offer size, cough-up price) | `src/tuning.ts` |
+| Any colour, the camera, the bulb, the vignette, the gore and wobble | `src/screens/shared.css` (`:root`) |
 | A screen's layout and look | `src/screens/<screen>.kdl` and `.css` |
 | The words weapons, enemies and drops can use | `src/weapons.ts`, `src/enemies.ts`, `src/rewards.ts` |
 
@@ -59,14 +61,15 @@ Source: **GitHub Actions**. The game is then at `https://<owner>.github.io/<repo
 
 ## What's here
 
-- The rules, pure: `src/game.ts` (a run: waves, the fight's step, mounted weapons, the shop, meta), `src/world.ts`
+- The rules, pure: `src/game.ts` (a run: waves, the fight's step, the stomach slots, the shop, meta), `src/world.ts`
   (the run's shape, geometry, firing), `src/weapons.ts`, `src/enemies.ts`, `src/rewards.ts` (behaviour words), `src/content.ts`
   (the content kinds), `src/tuning.ts`. Tests: `src/game.test.ts`; balance: `npm run sim`.
-- The shell: `src/store.ts`, `src/actions.ts`, `src/input.ts`, `src/runtime.ts`, `src/view/scene.ts` (the arena in
+- The shell: `src/store.ts`, `src/actions.ts`, `src/input.ts`, `src/runtime.ts`, `src/view/scene.ts` (the basement in
   Three), `src/screens/` (title, hud, shop, over, pause).
 - Foundation from the game-bible starter (keep; change only with a catalog row and a test): `src/decl/`,
   `src/content-load.ts`, `src/clock.ts`, `src/rng.ts`, `src/tokens.ts`, `src/view/look.ts`, `src/stage.ts`, the
   guard tests, `src/stories/stage.ts`, `.storybook/`, `scripts/`, `models/kit.py`.
 
-There are no Blender models yet: enemies are primitive meshes picked by `shape=` in `content/enemies.kdl`. The first
+There are no Blender models yet: the kid and the enemies are built from squashed spheres in `src/view/scene.ts`,
+picked by `shape=` in `content/enemies.kdl`. The first
 `models/<name>.py` imports `kit` and follows the rig contract in its header.

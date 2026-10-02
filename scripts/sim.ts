@@ -1,7 +1,7 @@
 // Balance sim: `npm run sim [runs] [max_minutes]`. Plays whole runs headless on the pure core with a simple bot and
-// prints how far it gets. The bot backs away from the nearest enemy, aims at it, and calls each other weapon as soon
+// prints how far it gets. The bot backs away from the nearest enemy, aims at it, and calls each other thing as soon
 // as it's ready (a human picks their moments, so they should do better); in the shop it buys the dearest
-// weapon it can afford (selling the blaster for room when the mounts are full), else moves on. A run that reaches
+// thing it can afford (selling the spit for room when the slots are full), else moves on. A run that reaches
 // max_minutes stops there.
 import { buy, canFire, cantBuy, fireWeapon, nextWave, newGame, IDLE, sell, step, type GameState } from '../src/game';
 import { weaponDef } from '../src/content';
@@ -25,7 +25,7 @@ function shopBot(s: GameState): GameState {
   const want = [...s.offer].sort((a, b) => weaponDef(b).price - weaponDef(a).price).find((w) => cantBuy(s, w) !== 'points');
   if (!want) return nextWave(s);
   if (cantBuy(s, want) === 'mounts') {
-    const blaster = s.mounts.findIndex((m) => m.weapon === 'blaster'), sold = blaster >= 0 ? sell(s, blaster) : s;
+    const spit = s.mounts.findIndex((m) => m.weapon === 'spit'), sold = spit >= 0 ? sell(s, spit) : s;
     return sold !== s && !cantBuy(sold, want) ? buy(sold, want) : nextWave(s);
   }
   return buy(s, want);

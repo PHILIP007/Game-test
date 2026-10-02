@@ -6,7 +6,7 @@ import { persist, type PersistStorage } from 'zustand/middleware';
 import { newGame, newMeta, parseMeta, type GameState, type Meta } from './game';
 
 /** The save's key: the game's own, so two games on one origin don't share a save. */
-export const META_KEY = 'deckfire.meta';
+export const META_KEY = 'gob.meta';
 
 export type GameStore = { run: GameState; meta: Meta };
 

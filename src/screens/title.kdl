@@ -1,16 +1,16 @@
-// The title screen, over the arena: the game's name and tagline at the top, how to play in the middle, the play
+// The title screen, over the basement: the game's name and tagline at the top, how to play in the middle, the play
 // button and your records at the bottom. Styled in title.css; bound in title.ts.
 prefab "title" {
     panel class="title" {
         panel class="title-scrim"
         panel class="title-top" {
-            text class="title-name" "DECKFIRE"
-            text class="title-tag" "AN ARENA SHOOTER OF MOUNTED GUNS"
+            text class="title-name" "GOB"
+            text class="title-tag" "SPIT. PUKE. SURVIVE THE BASEMENT."
         }
         panel class="title-how" {
             text class="title-line" "WASD OR ARROWS TO MOVE  ·  THE MOUSE AIMS  ·  ESC PAUSES"
-            text class="title-line" "MOUNT 1 FIRES BY ITSELF  ·  FIRE MOUNTS 2 3 4 WITH THEIR KEYS OR A CLICK, WHEN READY"
-            text class="title-line" "KILLS PAY POINTS  ·  AFTER EACH WAVE, BUY A WEAPON OR SELL ONE IN THE SHOP"
+            text class="title-line" "YOU SPIT BY YOURSELF  ·  2 3 4 OR A CLICK USES WHATEVER ELSE YOU'VE SWALLOWED"
+            text class="title-line" "THINGS DROP PENNIES  ·  AFTER EACH WAVE, SWALLOW SOMETHING NEW FROM THE SHOP"
         }
         panel class="title-bottom" {
             panel class="title-buttons" slot="buttons"

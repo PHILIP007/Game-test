@@ -1,4 +1,4 @@
-// The pilot's controls: keys held and where the cursor is. This is per-frame scratch, so it lives here, not in a
+// The kid's controls: keys held and where the cursor is. This is per-frame scratch, so it lives here, not in a
 // store; each step the runtime reads it once (`readInput`) and hands it to the core. Weapon keys and the pause key
 // call actions directly. Which key does what is the tables below. While the cursor is over a tappable tile (to
 // click a weapon) the aim holds where it was, so calling a weapon doesn't swing it at the HUD.
@@ -32,7 +32,7 @@ export function readInput(): Input {
 }
 
 /**
- * Listen on the window; `project` turns a cursor position into a point on the arena floor, `onUi` says when the
+ * Listen on the window; `project` turns a cursor position into a point on the basement floor, `onUi` says when the
  * cursor is over something tappable. Returns the disposer.
  */
 export function listenInput(project: typeof toWorld, onUi: typeof overUi) {

@@ -1,16 +1,14 @@
-/* The HUD (hud.kdl), over the arena during a run. Sizes are design px, times in s. */
+/* The HUD (hud.kdl), over the basement during a run. Sizes are design px, times in s. */
 .hud { width: 100%; height: 100%; justify-content: space-between; padding: 8px 12px 8px 12px }
 .hud-top { flex-direction: row; align-items: center; justify-content: space-between }
-.hud-label { font-family: var(--title-font); font-size: 11px; letter-spacing: 2px; font-color: var(--dim) }
-.hud-num { font-family: var(--title-font); font-size: 13px }
-.hud-bar { width: 120px; height: 8px; background-color: var(--panel); border-color: var(--edge); border-width: 1px }
 
-.hud-hull { flex-direction: row; align-items: center; gap: 8px; width: 240px }
-.hud-hull-fill { width: 100%; height: 100%; tint: var(--hull); transition: scale .2s }
-.hud-wave { font-family: var(--title-font); font-size: 16px; letter-spacing: 4px; font-color: var(--accent) }
+/* One heart per point of health: 8 hearts at 20 px each, with room between. */
+.hud-health { width: 240px; height: 22px }
+.hud-hearts { width: 200px; height: 20px; tint: var(--heart) }
+.hud-wave { font-family: var(--title-font); font-size: 22px; letter-spacing: 3px; font-color: var(--accent) }
 .hud-right { flex-direction: row; align-items: center; justify-content: flex-end; gap: 14px; width: 240px }
-.hud-points { font-family: var(--title-font); font-size: 15px; letter-spacing: 2px; font-color: var(--points) }
-.hud-score { font-family: var(--title-font); font-size: 12px; letter-spacing: 2px; font-color: var(--dim) }
+.hud-pennies { font-family: var(--title-font); font-size: 20px; letter-spacing: 1px; font-color: var(--penny) }
+.hud-score { font-family: var(--title-font); font-size: 15px; letter-spacing: 1px; font-color: var(--dim) }
 
-/* The mounts strip catches the pointer, so the aim holds anywhere along it (see input.ts), not just over a tile. */
-.hud-mounts { flex-direction: row; gap: 8px; justify-content: center; pointer-events: auto }
+/* The stomach strip catches the pointer, so the aim holds anywhere along it (see input.ts), not just over a tile. */
+.hud-slots { flex-direction: row; gap: 8px; justify-content: center; pointer-events: auto }

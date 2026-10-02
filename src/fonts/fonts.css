@@ -1,0 +1,7 @@
+/* The game's font, bundled so it works offline: Gochi Hand by Juan Pablo del Peral, under the SIL Open Font License
+   (OFL.txt beside it). The palette names it as --title-font and --body-font in src/screens/shared.css. */
+@font-face {
+  font-family: "Gochi Hand";
+  src: url("./gochi-hand.woff2") format("woff2");
+  font-display: block;
+}

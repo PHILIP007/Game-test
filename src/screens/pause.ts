@@ -14,8 +14,8 @@ export function drawPause() {
   if (screen !== 'run' || !paused || run.phase !== 'fight') return pauseUi.show(null);
   pauseUi.show(dialog(
     'PAUSED',
-    `WAVE ${run.wave}  ·  ${mountedCount(run.mounts)} OF ${run.mounts.length} MOUNTS ARMED`,
-    [line('WASD MOVE  ·  MOUSE AIM  ·  2 3 4 OR CLICK FIRE A READY WEAPON  ·  ESC RESUME')],
+    `WAVE ${run.wave}  ·  ${mountedCount(run.mounts)} OF ${run.mounts.length} THINGS SWALLOWED`,
+    [line('WASD MOVE  ·  MOUSE AIM  ·  2 3 4 OR CLICK USE A READY ONE  ·  ESC RESUME')],
     [btn('RESUME', () => Actions.togglePause(), 'primary'), btn('QUIT', () => Actions.toTitle())],
   ));
 }

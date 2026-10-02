@@ -10,26 +10,26 @@ import enemiesKdl from '../content/enemies.kdl?raw';
 import wavesKdl from '../content/waves.kdl?raw';
 import weaponsKdl from '../content/weapons.kdl?raw';
 
-/** A palette token in screens/shared.css :root (`--enemy-crawler`); the shell reads its colour through tokens.ts. */
-const paint = z.string().regex(/^--[\w-]+$/, 'a palette token like "--enemy-crawler"');
+/** A palette token in screens/shared.css :root (`--enemy-fly`); the shell reads its colour through tokens.ts. */
+const paint = z.string().regex(/^--[\w-]+$/, 'a palette token like "--enemy-fly"');
 const child = z.strictObject({ name: z.string(), args: z.array(z.unknown()), props: z.strictObject({}) });
 
 // ---------- weapons ----------
 
 /** What a weapon is for: its frame colour on screen, and nothing else. */
-export const WEAPON_KINDS = ['gun', 'support'] as const;
+export const WEAPON_KINDS = ['attack', 'defend'] as const;
 
 export const WeaponSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
-  /** Points to buy it in the shop (0: never on offer). It sells back for SELL_BACK of this. */
+  /** Pennies to buy it in the shop (0: never on offer). Coughing it up pays back SELL_BACK of this. */
   price: z.number().int().nonnegative(),
-  /** Seconds between shots: how often its words run. The balance lever: big hits come slowly. */
+  /** Seconds between uses: how often its words can run. The balance lever: big hits come slowly. */
   'cooldown-s': z.number().positive(),
   kind: z.enum(WEAPON_KINDS),
-  /** Its shots' colour in the arena. */
+  /** Its gobs' colour in the basement. */
   paint,
-  /** Copies mounted when a run starts. */
+  /** Copies swallowed when a run starts. */
   starting: z.number().int().nonnegative().default(0),
   /** The words on its tile. `{volley.0}` quotes the first number of its own `volley` word and `{cooldown}` its
    *  cooldown-s, so the text can't go stale. */
@@ -48,7 +48,7 @@ export const WEAPONS = loadKdl(weaponsKdl, { weapon: WeaponSchema }).weapon;
 export const WEAPON_IDS = Object.keys(WEAPONS);
 /** What the shop can offer: every weapon with a price. */
 export const SHOP_IDS = WEAPON_IDS.filter((id) => WEAPONS[id]!.price > 0);
-/** The weapons a run starts with: each weapon's `starting` copies, in file order. */
+/** What the kid has swallowed when a run starts: each weapon's `starting` copies, in file order. */
 export const STARTING_WEAPONS = WEAPON_IDS.flatMap((id) => Array<string>(WEAPONS[id]!.starting).fill(id));
 
 export function weaponDef(id: string): WeaponDef {
@@ -59,16 +59,16 @@ export function weaponDef(id: string): WeaponDef {
 
 // ---------- enemies ----------
 
-/** The meshes an enemy can wear in the arena (src/view/scene.ts draws each). */
-export const SHAPES = ['spike', 'block', 'gem', 'orb'] as const;
+/** The bodies an enemy can have in the basement (src/view/scene.ts builds each). */
+export const SHAPES = ['fly', 'head', 'lump', 'blob'] as const;
 
 export const EnemySchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   hp: z.number().positive(),
-  /** Radius, u: what shots and the pilot collide with. */
+  /** Radius, u: what gobs and the kid collide with. */
   r: z.number().positive(),
-  /** Damage when it touches the pilot. */
+  /** Hearts lost when it touches the kid. */
   touch: z.number().int().nonnegative(),
   paint,
   shape: z.enum(SHAPES),

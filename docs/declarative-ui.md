@@ -98,6 +98,7 @@ Built-ins (engine) and game-defined (`defineProp` in shared.ts).
 | `text` | `bind="x"` or a literal |
 | `sprite` | atlas texture (needs an atlas: screenUi's `texture` hook throws until the game has one) |
 | `meter` | `meter value=(bind)"fill"`: a fill of `w * value` (0..1), coloured by `tint` |
+| `hearts` | `hearts value=(bind)"hp" max=(bind)"max"`: `max` hearts across the box, the first `value` full, the rest hollow; coloured by `tint` |
 
 ## Shared prefabs
 
@@ -106,54 +107,59 @@ Build them with the binding builders exported from `screens/shared.ts`.
 | Prefab | Use |
 |---|---|
 | `btn` | `btn(label, tap, state?)`; state `primary` / `off` |
-| `weapon` | `weapon(id, tap, { key, tag, charge, foot, off?, ready? })`: a weapon tile from `content/weapons.kdl`; `charge` fills its cooldown bar; its kind, `off` and `ready` are classes; no tap, not pressable |
-| `mount-empty` | `emptyMount(key)`: an empty mount, the size of a weapon tile |
+| `weapon` | `weapon(id, tap, { key, tag, charge, foot, off?, ready? })`: a weapon tile from `content/weapons.kdl`; `charge` fills its cooldown bar; its kind, `off` and `ready` are classes; no tap (the automatic slot), not pressable |
+| `slot-empty` | `emptySlot(key)`: an empty stomach slot, the size of a weapon tile |
 | `line` | `line(text)`: a line of text in a dialog's body |
-| `dialog` | `dialog(title, sub, body, buttons, layout?)`: over the dimmed arena, swallows taps; `layout` `column` (lines) or `row` (tiles) |
+| `dialog` | `dialog(title, sub, body, buttons, layout?)`: over the dimmed basement, swallows taps; `layout` `column` (lines) or `row` (tiles) |
 
 ## Palette
 
-UI colours, the arena's colours, one `--weapon-<id>` per weapon and one `--enemy-<id>` per enemy (a guard test checks
-every `paint=` is here and named after its weapon or enemy).
+UI colours, the basement's colours, one `--weapon-<id>` per weapon and one `--enemy-<id>` per enemy (a guard test
+checks every `paint=` is here and named after its weapon or enemy).
 
 | Token | Use |
 |---|---|
-| `--ink` | the darkest background, the arena's clear colour and ground bounce, a cooldown bar's track |
+| `--ink` | the darkest background, the basement's clear colour and bounce light, a cooldown bar's track |
 | `--panel` | button, tile and bar fill |
-| `--panel-ready` | a called weapon's tile when it can fire |
-| `--edge` | button, bar and empty-mount border |
+| `--panel-ready` | a called slot's tile when it can be used |
+| `--edge` | button and empty-slot border |
 | `--text` | body text |
 | `--dim` | secondary text |
-| `--accent` | primary UI accent: primary buttons, hover, the wave, dialog titles |
+| `--accent` | primary UI accent: primary buttons, hover, the wave, dialog titles, the title |
 | `--scrim` | the dark behind a dialog and the title |
-| `--hull` | the hull (health) bar |
-| `--points` | points: the HUD's count, the shop's, prices |
+| `--heart` | the hearts |
+| `--penny` | pennies: the HUD's count, the shop's, prices |
 | `--pop` | overshoot easing |
-| `--title-font` | headings, numbers and button labels |
+| `--title-font` | headings, numbers and button labels (Gochi Hand, bundled in `src/fonts`) |
 | `--body-font` | body text |
-| `--kind-gun` | a gun's tile frame and cooldown bar |
-| `--kind-support` | a support weapon's tile frame and cooldown bar |
-| `--floor` | the arena's floor |
-| `--grid` | the floor's 1 u grid lines |
-| `--wall` | the arena's walls (they glow in it) |
-| `--light` | the key and sky light's hue |
-| `--pilot` | the pilot's dart, and its burst when it dies |
-| `--shield` | the shield bubble |
+| `--kind-attack` | an attack's tile frame and cooldown bar |
+| `--kind-defend` | a defence's tile frame and cooldown bar |
+| `--floor` | the basement floor |
+| `--grid` | the seams between floor tiles |
+| `--wall` | the walls |
+| `--light` | the bulb's hue (key and bounce light) |
+| `--vignette` | the dark round the screen's edges |
+| `--kid-skin` | the kid's skin, and their burst when they die |
+| `--kid-eye` | the kid's eyes |
+| `--kid-mouth` | the kid's mouth |
+| `--bubble` | the spit bubble round the kid |
 | `--reticle` | the aim ring under the cursor |
-| `--shot-foe` | enemies' shots |
-| `--weapon-blaster` | the blaster's shots |
-| `--weapon-twin` | the twin's shots |
-| `--weapon-scatter` | the scatter's shots |
-| `--weapon-rail` | the rail's slug |
-| `--weapon-repeater` | the repeater's shots |
-| `--weapon-nova` | the nova's ring |
-| `--weapon-barrage` | the barrage's shots |
-| `--weapon-barrier` | the barrier (support) |
-| `--weapon-medic` | the repair drone (support) |
-| `--enemy-crawler` | the crawler, and its kill burst |
-| `--enemy-spitter` | the spitter |
-| `--enemy-charger` | the charger |
-| `--enemy-brute` | the brute |
+| `--eye` | every enemy's eyes |
+| `--mouth` | every enemy's mouth |
+| `--enemy-spit` | what enemies spit back, the weeper's tears, the blood in the gore |
+| `--weapon-spit` | spit |
+| `--weapon-slobber` | slobber |
+| `--weapon-chunks` | chunks |
+| `--weapon-tooth` | the loose tooth |
+| `--weapon-raspberry` | the raspberry |
+| `--weapon-burp` | the big burp's ring |
+| `--weapon-puke` | projectile puke |
+| `--weapon-bubble` | the spit bubble (defence) |
+| `--weapon-lick` | lick wounds (defence) |
+| `--enemy-fly` | the fly, and its gore |
+| `--enemy-weeper` | the weeper |
+| `--enemy-squealer` | the squealer |
+| `--enemy-glutton` | the glutton |
 
 ## Look
 
@@ -165,25 +171,33 @@ no unit is a strength, a count or a 0..1 amount.
 | Name | Use |
 |---|---|
 | `--look-exposure` | tone-mapping exposure, the whole frame |
-| `--look-key-light` | key light intensity (`--light`) |
-| `--look-key-dir` | `x y z` towards the key light |
-| `--look-fill-light` | sky/ground fill intensity |
-| `--look-glow` | how brightly enemies glow in their own colour |
+| `--look-key-light` | the bulb's intensity (`--light`) |
+| `--look-key-dir` | `x y z` towards the bulb |
+| `--look-fill-light` | bounce light intensity |
+| `--look-glow` | how much enemies glow in their own colour |
+| `--look-wall-glow` | how much the walls glow in their own colour |
+| `--look-vignette` | how dark the screen's edges get (0..1) |
+| `--look-vignette-start` | where the dark starts (0 centre, 1 the corners) |
 | `--look-camera-fov-deg` | field of view |
 | `--look-camera-tilt-rad` | camera tilt off straight down |
-| `--look-camera-margin` | room round the arena (1: edge to edge); the camera backs off to fit it |
-| `--look-camera-lift-u` | how far below the arena's centre the camera looks, so the arena clears the mounts |
+| `--look-camera-margin` | room round the floor (1: edge to edge); the camera backs off to fit it |
+| `--look-camera-lift-u` | how far below the floor's centre the camera looks, so the floor clears the stomach slots |
 | `--look-flash-s` | how long a struck enemy shows white |
 | `--look-flash-glow` | how bright that flash is |
-| `--look-burst-bits` | bits flung out when an enemy dies |
+| `--look-burst-bits` | bits of gore flung out when an enemy pops |
 | `--look-burst-speed-u-s` | how fast they fly |
-| `--look-burst-gravity-u-s2` | how hard they fall back |
+| `--look-burst-gravity-u-s2` | how hard they fall back (they splat on the floor) |
 | `--look-burst-s` | how long they last |
 | `--look-shake-u` | how far the camera shakes when you're hurt |
 | `--look-shake-s` | how long it shakes |
-| `--look-spin-rad-s` | how fast gems and orbs turn |
+| `--look-wobble` | how much fleshy enemies squash (0..1) |
+| `--look-wobble-hz` | how fast they wobble |
+| `--look-flap-hz` | how fast flies' wings flap |
+| `--look-body-scale` | how big bodies are drawn against what they collide with (1: exactly) |
 | `--look-spawn-grow-s` | how long a new enemy takes to grow in |
-| `--look-windup-shake-u` | how hard a charger shakes before it lunges |
+| `--look-windup-shake-u` | how hard a squealer shakes before it charges |
+| `--look-gape-s` | how long the kid's mouth gapes after spitting |
+| `--look-gape` | how wide it gapes (1: shut) |
 
 ## Behaviour words
 
@@ -195,23 +209,23 @@ across all three.
 | Word | Use |
 |---|---|
 | `volley` | weapon: `volley n spread_deg damage`: n shots fanned across spread_deg along your aim (n 1: one straight shot) |
-| `rail` | weapon: `rail damage`: one fast slug that goes through everything |
+| `pierce` | weapon: `pierce damage`: one fast shot that goes through everything (the tooth) |
 | `nova` | weapon: `nova n damage`: n shots in a ring all round you |
 | `shield` | weapon: `shield s`: a bubble for s seconds, nothing touches you |
 | `mend` | weapon: `mend n`: n health back |
-| `chase` | enemy: `chase speed_u_s`: walk straight at the pilot |
+| `chase` | enemy: `chase speed_u_s`: go straight for the kid |
 | `orbit` | enemy: `orbit range_u speed_u_s`: keep about range_u away and circle |
-| `lunge` | enemy: `lunge every_s speed_u_s`: stop, shake, then dash at the pilot |
-| `shoot` | enemy: `shoot every_s speed_u_s`: one shot at the pilot |
+| `lunge` | enemy: `lunge every_s speed_u_s`: stop, shake, then charge at the kid |
+| `shoot` | enemy: `shoot every_s speed_u_s`: one shot at the kid |
 | `spray` | enemy: `spray n every_s speed_u_s`: n shots in a ring |
-| `points` | drop: `points n`: n points to spend in the shop (and towards the score) |
-| `heal` | drop: `heal n`: n health back |
+| `pennies` | drop: `pennies n`: n pennies to spend in the shop (and towards the score) |
+| `heal` | drop: `heal n`: n hearts back |
 
 ## Content kinds
 
 | Kind | Use |
 |---|---|
-| `weapon` | `weapon "id" name= price= cooldown-s= kind= paint="--weapon-<id>" starting= text= { weapon words }`, in `content/weapons.kdl`; `{word.i}` and `{cooldown}` in `text` quote its own numbers; price 0 is never on offer |
+| `weapon` | `weapon "id" name= price= cooldown-s= kind= paint="--weapon-<id>" starting= text= { weapon words }`, in `content/weapons.kdl`; `{word.i}` and `{cooldown}` in `text` quote its own numbers; price 0 is never on offer; the kid starts with the `starting` ones swallowed |
 | `enemy` | `enemy "id" name= hp= r= touch= paint="--enemy-<id>" shape= { enemy words, drop words }`, in `content/enemies.kdl` |
 | `wave` | `wave "id" gap-s= { <enemy id> <count> ... }`, in `content/waves.kdl`, in order; the list repeats, a lap harder |
 
@@ -221,19 +235,19 @@ The `kind=` of a weapon: its tile's frame and cooldown bar colour (`--kind-<kind
 
 | Kind | Use |
 |---|---|
-| `gun` | weapons that fire shots |
-| `support` | weapons that shield or repair you |
+| `attack` | things you spit, burp or puke at them |
+| `defend` | things that keep you alive: the bubble, licking wounds |
 
 ## Enemy shapes
 
-The `shape=` of an enemy: its mesh in the arena (`src/view/scene.ts`), sized by its `r`.
+The `shape=` of an enemy: its body in the basement (`src/view/scene.ts`), sized by its `r`, always facing the kid.
 
 | Shape | Use |
 |---|---|
-| `spike` | a five-sided cone pointing at the pilot |
-| `block` | a cube that turns to face the pilot |
-| `gem` | a spinning octahedron |
-| `orb` | a spinning faceted ball |
+| `fly` | a fat dark body, two eyes and two flapping wings; it hovers |
+| `head` | a floating head with black eyes streaming blood and a small mouth; it wobbles |
+| `lump` | a squat lump with a snout and beady eyes; it wobbles |
+| `blob` | a huge body that's mostly mouth, two little eyes on top; it wobbles |
 
 ## Content helpers
 
@@ -280,8 +294,8 @@ In draw order (later on top). Each is `screens/<name>.kdl` + `.css` + `.ts` (bin
 
 | Screen | Use |
 |---|---|
-| `title` | the name, how to play, PLAY, your records |
-| `hud` | during a run: hull, wave, points, score; the weapon mounts with their cooldown bars (tap a ready one to fire it) |
-| `shop` | after a cleared wave: three weapons to buy (one, then the next wave), your mounts to sell, or move on |
+| `title` | the name (GOB), how to play, PLAY, your records |
+| `hud` | during a run: hearts, wave, pennies, score; the stomach slots with their cooldown bars (tap a ready one to use it) |
+| `shop` | after a cleared wave: three things to swallow (one, then the next wave), your stomach to cough up, or move on |
 | `over` | the run is over: its numbers, go again or back to the title (a `dialog`) |
 | `pause` | the run is paused: resume or quit (a `dialog`) |

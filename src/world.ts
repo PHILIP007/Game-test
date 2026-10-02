@@ -7,7 +7,7 @@ export type Vec = { x: number; y: number };
 export type Player = {
   x: number; y: number;
   hp: number;
-  /** Where the pilot is aiming: a unit vector, set from the cursor every step. Weapons fire along it. */
+  /** Where the kid is aiming: a unit vector, set from the cursor every step. Weapons fire along it. */
   aim: Vec;
   /** Seconds left untouchable (after a hit, or under a shield). */
   graceS: number;
@@ -15,7 +15,7 @@ export type Player = {
   shieldS: number;
 };
 
-/** A weapon slot on the pilot: the weapon's id (`''` when empty) and seconds until it fires again. */
+/** A weapon slot on the kid: the weapon's id (`''` when empty) and seconds until it fires again. */
 export type Mount = { weapon: string; cooldownS: number };
 
 /** What an enemy is doing: walking its behaviour words, or a charger's windup and lunge. */
@@ -36,7 +36,7 @@ export type Enemy = {
   spin: number;
 };
 
-/** Who fired a shot: one of the pilot's weapons (its id), or an enemy. Its paint follows from this. */
+/** Who fired a shot: one of the kid's weapons (its id), or an enemy. Its paint follows from this. */
 export type ShotSource = 'foe' | { weapon: string };
 
 export type Shot = {
@@ -79,7 +79,7 @@ export type GameState = {
   player: Player;
   enemies: Enemy[];
   shots: Shot[];
-  /** The pilot's weapon slots, MOUNTS of them, left to right. */
+  /** The kid's weapon slots, MOUNTS of them, left to right. */
   mounts: Mount[];
   /** Weapon ids on offer in the shop after a cleared wave. */
   offer: string[];
@@ -104,17 +104,17 @@ export const DEG = Math.PI / 180;
 
 /** A point kept `r` inside the arena's walls. */
 export function clampToArena(p: Vec, r: number): Vec {
-  const hw = T.ARENA_W_U / 2 - r, hh = T.ARENA_H_U / 2 - r;
+  const hw = T.FLOOR_W_U / 2 - r, hh = T.FLOOR_H_U / 2 - r;
   return { x: Math.max(-hw, Math.min(hw, p.x)), y: Math.max(-hh, Math.min(hh, p.y)) };
 }
 
-export const inArena = (p: Vec) => Math.abs(p.x) <= T.ARENA_W_U / 2 && Math.abs(p.y) <= T.ARENA_H_U / 2;
+export const inArena = (p: Vec) => Math.abs(p.x) <= T.FLOOR_W_U / 2 && Math.abs(p.y) <= T.FLOOR_H_U / 2;
 
 // ---------- firing ----------
 
 export type ShotSpec = { dir: Vec; speed: number; damage: number; r?: number; pierce?: boolean; lifeS?: number; at?: Vec };
 
-/** The state with new shots leaving the pilot (or `at`), each along its own `dir`. */
+/** The state with new shots leaving the kid (or `at`), each along its own `dir`. */
 export function fire(s: GameState, from: ShotSource, specs: ShotSpec[]): GameState {
   if (!specs.length) return s;
   const shots = specs.map((p, i): Shot => {

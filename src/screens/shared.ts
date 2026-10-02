@@ -25,6 +25,23 @@ defineElement('meter', ({ value }, { w, h }) => {
   return c;
 });
 
+/**
+ * A row of hearts, `max` of them, the first `value` full and the rest hollow, as tall as the box and spaced across
+ * it; coloured by `tint`: `hearts value=(bind)"hp" max=(bind)"max"`.
+ */
+defineElement('hearts', ({ value, max }, { w, h }) => {
+  const c = new Container(), n = Math.max(1, max as number), full = value as number;
+  const size = Math.min(h, w / n / 1.15), step = n > 1 ? (w - size) / (n - 1) : 0;
+  for (let i = 0; i < n; i++) {
+    const g = new Graphics(), r = size / 4, x = i * step, y = (h - size) / 2;
+    // Two lobes and a point: a heart drawn in its box's top-left corner.
+    g.circle(x + r, y + r * 1.25, r).circle(x + r * 3, y + r * 1.25, r)
+      .poly([x, y + r * 1.5, x + size, y + r * 1.5, x + size / 2, y + size]).fill({ color: 0xffffff, alpha: i < full ? 1 : 0.22 });
+    c.addChild(g);
+  }
+  return c;
+});
+
 // ---------- the screen factory ----------
 
 const screens: ReturnType<typeof createUi>[] = [];
@@ -75,12 +92,12 @@ export function weapon(id: string, tap: (() => void) | undefined, opts: { key: s
   return use('weapon', { key: opts.key, name: d.name.toUpperCase(), tag: opts.tag, text: d.text, charge: opts.charge, foot: opts.foot, tap, state });
 }
 
-/** A mount with nothing in it. */
-export const emptyMount = (key: string) => use('mount-empty', { key });
+/** A stomach slot with nothing in it. */
+export const emptySlot = (key: string) => use('slot-empty', { key });
 
 /** A line of text in a dialog's body. */
 export const line = (text: string) => use('line', { key: text, text });
 
-/** A dialog over the dimmed arena: a title, a line under it, a body (a column of lines, or a `row` of tiles) and buttons. */
+/** A dialog over the dimmed basement: a title, a line under it, a body (a column of lines, or a `row` of tiles) and buttons. */
 export const dialog = (title: string, sub: string, body: Use[], buttons: Use[], layout: 'column' | 'row' = 'column') =>
   use('dialog', { title, sub, layout }, { body, buttons });

@@ -12,9 +12,9 @@ export function drawOver() {
   const { screen } = ui.getState(), { run, meta } = game.getState();
   if (screen !== 'run' || run.phase !== 'dead') return overUi.show(null);
   overUi.show(dialog(
-    'HULL BREACHED',
-    `YOU FELL ON WAVE ${run.wave}`,
-    [line(`SCORE ${run.score}  ·  ${run.kills} KILLS`), line(`BEST ${meta.best}  ·  FURTHEST WAVE ${meta.bestWave}`)],
+    'YOU CHOKED',
+    `THE BASEMENT GOT YOU ON WAVE ${run.wave}`,
+    [line(`SCORE ${run.score}  ·  ${run.kills} THINGS POPPED`), line(`BEST ${meta.best}  ·  FURTHEST WAVE ${meta.bestWave}`)],
     [btn('AGAIN', () => Actions.start(), 'primary'), btn('TITLE', () => Actions.toTitle())],
   ));
 }

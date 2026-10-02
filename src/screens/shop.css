@@ -1,5 +1,5 @@
 /* The shop (shop.kdl): its deltas from the shared dialog. It holds two rows of weapon tiles, so it packs tighter.
    Sizes are design px, times in s. */
-.shop-title { font-family: var(--title-font); font-size: 22px; letter-spacing: 6px; font-color: var(--accent); animation: dialog-in .45s var(--pop) }
-.shop-points { font-family: var(--title-font); font-size: 16px; letter-spacing: 3px; font-color: var(--points) }
+.shop-title { font-family: var(--title-font); font-size: 34px; letter-spacing: 3px; font-color: var(--accent); animation: dialog-in .45s var(--pop) }
+.shop-pennies { font-family: var(--title-font); font-size: 20px; letter-spacing: 2px; font-color: var(--penny) }
 .shop-row { flex-direction: row; gap: 10px; justify-content: center }
