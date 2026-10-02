@@ -1,0 +1,9 @@
+// Shared prefabs, prepended to every screen's KDL by screenUi (shared.ts); styled in shared.css. Build them with the
+// binding builders in shared.ts. Elements, attributes and bindings: docs/declarative-ui.md.
+
+// A labelled button: btn(label, tap, state?) in shared.ts. `state` becomes classes (primary, off).
+prefab "btn" {
+    button bind-class="state" tap="tap" {
+        text class="shared-btn-label" bind="label"
+    }
+}
