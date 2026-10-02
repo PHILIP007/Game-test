@@ -31,8 +31,11 @@ export const T = {
   LUNGE_S: 0.45,
 
   // ---------- mounts and the shop ----------
-  /** Weapons the pilot can carry at once; each fires by itself on its own cooldown. */
+  /** Weapons the pilot can carry at once, each on its own cooldown. */
   MOUNTS: 4,
+  /** The first this many mounts fire by themselves whenever their cooldown comes round; the rest fire only when you
+   *  call them (click the tile, or press its number), so when to use them is your skill. */
+  AUTO_MOUNTS: 1,
   /** Weapons on offer in the shop after a cleared wave; you buy one or move on. */
   OFFER_SIZE: 3,
   /** A sold weapon pays back this fraction of its price (rounded down), so swapping costs something. */

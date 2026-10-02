@@ -8,8 +8,8 @@ prefab "btn" {
     }
 }
 
-// A weapon from content/weapons.kdl: weapon(id, tap, { key, tag, charge, foot, off? }) in shared.ts. Its kind (gun,
-// support) and `off` become classes; with no tap (the HUD) it can't be pressed.
+// A weapon from content/weapons.kdl: weapon(id, tap, { key, tag, charge, foot, off?, ready? }) in shared.ts. Its kind
+// (gun, support), `off` and `ready` become classes; with no tap (an automatic mount) it can't be pressed.
 prefab "weapon" {
     button class="weapon" bind-class="state" tap="tap" {
         panel class="weapon-top" {

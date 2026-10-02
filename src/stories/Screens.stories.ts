@@ -55,11 +55,18 @@ export const Fight: Story = {
     await ready();
     await expect(screenText()).toEqual(expect.arrayContaining(['WAVE 3', '90 PTS', 'BLASTER', 'SCATTER', 'RAIL', 'EMPTY MOUNT']));
     advance(100);
-    // Every mounted weapon fires by itself; each then waits out its own cooldown.
-    const s = game.getState().run;
-    await expect(firedBy(s, 'scatter')).toBeGreaterThan(0);
-    await expect(firedBy(s, 'rail')).toBeGreaterThan(0);
-    await expect(s.mounts[2]!.cooldownS).toBeGreaterThan(s.mounts[0]!.cooldownS);
+    // Mount 1 fires by itself; the others wait to be called.
+    let s = game.getState().run;
+    await expect(firedBy(s, 'blaster')).toBeGreaterThan(0);
+    await expect(firedBy(s, 'scatter') + firedBy(s, 'rail')).toBe(0);
+    await expect(screenText()).toContain('READY · PRESS 2');
+    await press('SCATTER'); // a click on its tile
+    s = game.getState().run;
+    await expect(firedBy(s, 'scatter')).toBe(5);
+    await expect(s.mounts[1]!.cooldownS).toBeGreaterThan(0);
+    dispatchEvent(new KeyboardEvent('keydown', { code: 'Digit3' })); // its key
+    dispatchEvent(new KeyboardEvent('keyup', { code: 'Digit3' }));
+    await expect(firedBy(game.getState().run, 'rail')).toBe(1);
   },
 };
 

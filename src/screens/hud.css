@@ -12,4 +12,5 @@
 .hud-points { font-family: var(--title-font); font-size: 15px; letter-spacing: 2px; font-color: var(--points) }
 .hud-score { font-family: var(--title-font); font-size: 12px; letter-spacing: 2px; font-color: var(--dim) }
 
-.hud-mounts { flex-direction: row; gap: 8px; justify-content: center }
+/* The mounts strip catches the pointer, so the aim holds anywhere along it (see input.ts), not just over a tile. */
+.hud-mounts { flex-direction: row; gap: 8px; justify-content: center; pointer-events: auto }

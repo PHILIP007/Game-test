@@ -1,6 +1,8 @@
-// The weapons. The pilot carries up to 4 (MOUNTS in src/tuning.ts); every mounted weapon fires at the cursor by
-// itself whenever its cooldown comes round, and holds its fire while the arena is empty. The shop after each wave
-// offers 3 of the weapons with a price; a sold weapon pays back half its price (SELL_BACK).
+// The weapons. The pilot carries up to 4 (MOUNTS in src/tuning.ts), each on its own cooldown. The weapon in mount 1
+// (AUTO_MOUNTS) fires at the cursor by itself whenever its cooldown comes round, holding its fire while the arena is
+// empty; the others wait, ready, until you call them (press 2, 3 or 4, or click the tile). Whatever you buy goes in
+// the first free mount, so sell the blaster and the next buy becomes your automatic weapon. The shop after each
+// wave offers 3 of the weapons with a price; a sold weapon pays back half its price (SELL_BACK).
 //   weapon "id" name="Shown name" price=<points> cooldown-s=<seconds between shots> kind="gun|support"
 //          paint="--token" starting=<copies mounted at the start> text="..." {
 //       weapon words, run top to bottom each time it fires

@@ -5,7 +5,7 @@ import { UPDATE_PRIORITY } from 'pixi.js';
 import * as Actions from './actions';
 import { onTick, startClock } from './clock';
 import { listenInput, readInput } from './input';
-import { fit, initPixi, pixi } from './stage';
+import { fit, initPixi, overUi, pixi } from './stage';
 import { game, ui } from './store';
 import { createScene, type Scene } from './view/scene';
 import { tickScreens } from './screens/shared';
@@ -38,7 +38,7 @@ export async function boot(el: HTMLElement): Promise<() => void> {
   const s = (scene = createScene(el, w, h));
   await initPixi(el, w, h);
 
-  const offInput = listenInput(s.toWorld);
+  const offInput = listenInput(s.toWorld, overUi);
   // The fight runs on the game clock, so a story can step it; it never counts as busy (it never stops by itself).
   const offFight = onTick((dt) => {
     const { screen, paused } = ui.getState();

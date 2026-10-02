@@ -2,8 +2,9 @@
 // here touches the renderer, the store, the DOM or storage (src/core-purity.test.ts holds that line). Each transition
 // leaves `events` describing what just happened, and the shell animates from those.
 //
-// A run: waves of enemies come in from the arena's edge (content/waves.kdl). Every weapon mounted on the pilot
-// (content/weapons.kdl) fires at the cursor by itself, each on its own cooldown. Kills pay points; clear a wave and
+// A run: waves of enemies come in from the arena's edge (content/waves.kdl). The pilot carries weapons in mounts
+// (content/weapons.kdl), each on its own cooldown: the first mount fires at the cursor by itself, the others when
+// you call them (fireWeapon) once they're ready. Kills pay points; clear a wave and
 // the shop offers weapons to buy with them, and buys back the ones you carry.
 import { z } from 'zod';
 import { SHOP_IDS, STARTING_WEAPONS, WAVES, enemyDef, weaponDef } from './content';
@@ -67,21 +68,38 @@ function movePilot(s: GameState, dtS: number, { move, aim }: Input): GameState {
   return { ...s, player: { ...p, ...at, aim: dist(at, aim) > 0.05 ? toward(at, aim) : p.aim, graceS: down(p.graceS), shieldS: down(p.shieldS) } };
 }
 
+/** Whether the weapon in mount `i` fires by itself (the first AUTO_MOUNTS) rather than when you call it. */
+export const isAuto = (i: number) => i < T.AUTO_MOUNTS;
+
+/** A weapon goes off: its words run and its cooldown starts again. */
+function shoot(s: GameState, i: number): GameState {
+  const m = s.mounts[i]!, d = weaponDef(m.weapon);
+  const n = d.effects.reduce((acc, fx) => fx(acc, m.weapon), s);
+  const mounts = n.mounts.slice();
+  mounts[i] = { ...m, cooldownS: d.cooldownS };
+  return { ...n, mounts };
+}
+
 /**
- * Every mounted weapon counts its cooldown down and, when it comes round, runs its words and starts again. With no
- * enemy on the field a ready weapon holds its fire (so a shield isn't spent on an empty arena).
+ * Every mounted weapon counts its cooldown down. An automatic one fires as soon as it's ready, unless no enemy is on
+ * the field (then it holds its fire); the others stay ready until you call them (fireWeapon).
  */
 function fireMounts(s: GameState, dtS: number): GameState {
-  let n = s;
-  const mounts = s.mounts.map((m): Mount => {
-    if (!m.weapon) return m;
-    const cooldownS = Math.max(0, m.cooldownS - dtS);
-    if (cooldownS > 0 || !s.enemies.length) return { ...m, cooldownS };
-    const d = weaponDef(m.weapon);
-    n = d.effects.reduce((acc, fx) => fx(acc, m.weapon), n);
-    return { ...m, cooldownS: d.cooldownS };
-  });
-  return { ...n, mounts };
+  let n: GameState = { ...s, mounts: s.mounts.map((m) => (m.weapon ? { ...m, cooldownS: Math.max(0, m.cooldownS - dtS) } : m)) };
+  n.mounts.forEach((m, i) => { if (m.weapon && isAuto(i) && m.cooldownS <= 0 && s.enemies.length) n = shoot(n, i); });
+  return n;
+}
+
+/** Whether the weapon in mount `i` can be called now: mid-fight, a called (not automatic) mount, and ready. */
+export const canFire = (s: GameState, i: number) => {
+  const m = s.mounts[i];
+  return s.phase === 'fight' && !isAuto(i) && !!m?.weapon && m.cooldownS <= 0;
+};
+
+/** Fire the weapon in mount `i` now (a click on its tile, or its key). Not ready, automatic or empty: no-op. */
+export function fireWeapon(s: GameState, i: number): GameState {
+  if (!canFire(s, i)) return s;
+  return shoot({ ...s, events: [] }, i);
 }
 
 /** The next enemy of the wave's queue, on a random spot of the arena's edge. */

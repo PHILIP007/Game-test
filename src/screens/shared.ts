@@ -66,11 +66,13 @@ export const btn = (label: string, tap: () => void, state = '') => use('btn', { 
 
 /**
  * A weapon from content/weapons.kdl. `tag` sits beside its name (its cooldown, its price), `charge` fills its bar
- * (0..1), `foot` is the line under it (buy, sell). No `tap`: it can't be pressed.
+ * (0..1), `foot` is the line under it (buy, sell, its key). `ready` lights it up: it can be fired now. No `tap`: it
+ * can't be pressed.
  */
-export function weapon(id: string, tap: (() => void) | undefined, opts: { key: string; tag: string; charge: number; foot: string; off?: boolean }) {
+export function weapon(id: string, tap: (() => void) | undefined, opts: { key: string; tag: string; charge: number; foot: string; off?: boolean; ready?: boolean }) {
   const d = weaponDef(id);
-  return use('weapon', { key: opts.key, name: d.name.toUpperCase(), tag: opts.tag, text: d.text, charge: opts.charge, foot: opts.foot, tap, state: `${d.kind}${opts.off ? ' off' : ''}` });
+  const state = [d.kind, opts.off && 'off', opts.ready && 'ready'].filter(Boolean).join(' ');
+  return use('weapon', { key: opts.key, name: d.name.toUpperCase(), tag: opts.tag, text: d.text, charge: opts.charge, foot: opts.foot, tap, state });
 }
 
 /** A mount with nothing in it. */

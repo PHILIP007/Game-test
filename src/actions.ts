@@ -17,6 +17,13 @@ export function step(dtS: number, input: Game.Input) {
   game.setState(next.phase === 'dead' && run.phase !== 'dead' ? { run: next, meta: Game.recordRun(meta, next) } : { run: next });
 }
 
+/** Fire the weapon in a called mount, if it's ready (a click on its tile, or its key). */
+export function fireWeapon(mount: number) {
+  if (ui.getState().paused) return;
+  const { run } = game.getState(), next = Game.fireWeapon(run, mount);
+  if (next !== run) game.setState({ run: next });
+}
+
 /** Buy a weapon on offer in the shop; the next wave starts. */
 export function buy(weapon: string) {
   game.setState({ run: Game.buy(game.getState().run, weapon) });

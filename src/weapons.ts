@@ -1,4 +1,4 @@
-// Weapon words: what a weapon does each time its cooldown comes round. content/weapons.kdl lists them under each
+// Weapon words: what a weapon does each time it fires. content/weapons.kdl lists them under each
 // weapon, one per line (`volley 5 40 1`), and they run top to bottom when it fires; content.ts hands this registry to
 // `combinators()`. Also the mounts' rules that don't need content: which are free, how many are filled.
 // Catalog: ## Behaviour words.

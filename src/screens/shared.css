@@ -5,6 +5,7 @@
   /* UI */
   --ink: #07090f;
   --panel: #121828;
+  --panel-ready: #1f2a46;
   --edge: #2c3754;
   --text: #e9eefb;
   --dim: #8792ad;
@@ -99,17 +100,20 @@ button.off { opacity: .45 }
 .shared-btn-label { font-family: var(--title-font); font-size: 16px; letter-spacing: 3px; font-color: var(--text) }
 
 /* A weapon tile: name and a tag (its cooldown, or its price in the shop), what it does, a bar that fills as its
-   cooldown comes round, and a foot line (buy, sell). The frame's colour says its kind; `off` when it can't be
-   bought or sold. */
+   cooldown comes round, and a foot line (buy, sell, its key). The frame's colour says its kind; `off` when it can't
+   be bought or sold; `ready` when a called weapon can fire. */
 button.weapon {
-  width: 138px; height: 80px; padding: 5px 8px; gap: 3px; align-items: stretch; justify-content: flex-start;
-  border-width: 2px; transition: scale .1s ease-out, opacity .15s;
+  width: 148px; height: 80px; padding: 5px 8px; gap: 3px; align-items: stretch; justify-content: flex-start;
+  border-width: 2px; transition: scale .1s ease-out, opacity .15s, translate .12s ease-out, background-color .12s;
 }
 .weapon.gun { border-color: var(--kind-gun) }
 .weapon.support { border-color: var(--kind-support) }
 .weapon.off { opacity: .4 }
-.weapon-top { flex-direction: row; align-items: center; justify-content: space-between }
-.weapon-name { font-family: var(--title-font); font-size: 13px; letter-spacing: 1px }
+/* A called weapon that can fire now: the tile lifts and its foot line lights up, so you see it's yours to use. */
+.weapon.ready { background-color: var(--panel-ready); translate: 0 -4px }
+.weapon.ready .weapon-foot { font-color: var(--accent) }
+.weapon-top { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px }
+.weapon-name { font-family: var(--title-font); font-size: 12px; letter-spacing: 1px }
 .weapon-tag { font-family: var(--title-font); font-size: 12px; font-color: var(--points) }
 .weapon-text { font-size: 11px; line-height: 13px; font-color: var(--dim); text-wrap: wrap; width: 100%; flex-grow: 1 }
 .weapon-bar { width: 100%; height: 4px; background-color: var(--ink) }
@@ -119,7 +123,7 @@ button.weapon {
 .weapon-foot { font-size: 10px; letter-spacing: 1px; font-color: var(--text); text-align: right; width: 100% }
 
 /* An empty mount: the size of a weapon tile, dashed out. */
-.mount-empty { width: 138px; height: 80px; align-items: center; justify-content: center; border-color: var(--edge); border-width: 1px; opacity: .6 }
+.mount-empty { width: 148px; height: 80px; align-items: center; justify-content: center; border-color: var(--edge); border-width: 1px; opacity: .6 }
 .mount-empty-label { font-size: 11px; letter-spacing: 2px; font-color: var(--dim) }
 
 /* A line of text in a dialog's body. */

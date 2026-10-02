@@ -37,3 +37,10 @@ export async function initPixi(el: HTMLElement, cssW: number, cssH: number) {
   pixi.stage.eventMode = 'static';
   fit(cssW, cssH);
 }
+
+/** Whether a cursor position (client px) is over something tappable on the UI canvas (a weapon tile, a button). */
+export function overUi(clientX: number, clientY: number) {
+  const r = pixi.canvas.getBoundingClientRect();
+  const hit = pixi.renderer.events.rootBoundary.hitTest(clientX - r.left, clientY - r.top);
+  return !!hit && hit !== pixi.stage;
+}

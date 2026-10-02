@@ -1,11 +1,12 @@
 # Deckfire
 
 A top-down arena shooter for the web. Waves of enemies pour in from the arena's edge. You carry up to four mounted
-weapons, and every one fires at the cursor by itself, each on its own cooldown: a quick blaster, a slow rail that
-goes through everything, a nova ring, a barrier that shields you every few seconds. Kills pay points; after each
-wave the shop offers three weapons to buy one of, and buys back the ones you carry for half their price.
+weapons, each on its own cooldown. The one in mount 1 fires at the cursor by itself; the others charge up and wait
+for you to call them, so when you spend a slow rail, a nova ring or a barrier is up to you. Kills pay points; after
+each wave the shop offers three weapons to buy one of, and buys back the ones you carry for half their price.
 
-**Controls:** WASD or arrows to move, the mouse aims, Esc pauses.
+**Controls:** WASD or arrows to move, the mouse aims, 2 3 4 (or a click on the tile) fires a ready weapon in that
+mount, Esc pauses.
 
 Enemies: the **crawler** swarms you, the **spitter** circles at range and shoots, the **charger** stops, shakes and
 lunges, and the **brute** is a slow, huge sponge that sprays rings of shots.
@@ -21,7 +22,7 @@ tests.
 | A weapon: price, cooldown, what it fires, its text | `content/weapons.kdl` |
 | An enemy: health, size, how it moves and attacks, the points it pays | `content/enemies.kdl` |
 | What each wave sends, in what order, how fast | `content/waves.kdl` |
-| A number a rule reads (speeds, mounts, offer size, sell-back) | `src/tuning.ts` |
+| A number a rule reads (speeds, mounts, how many fire by themselves, offer size, sell-back) | `src/tuning.ts` |
 | Any colour, the camera, the light, the juice | `src/screens/shared.css` (`:root`) |
 | A screen's layout and look | `src/screens/<screen>.kdl` and `.css` |
 | The words weapons, enemies and drops can use | `src/weapons.ts`, `src/enemies.ts`, `src/rewards.ts` |

@@ -106,7 +106,7 @@ Build them with the binding builders exported from `screens/shared.ts`.
 | Prefab | Use |
 |---|---|
 | `btn` | `btn(label, tap, state?)`; state `primary` / `off` |
-| `weapon` | `weapon(id, tap, { key, tag, charge, foot, off? })`: a weapon tile from `content/weapons.kdl`; `charge` fills its cooldown bar; its kind and `off` are classes; no tap, not pressable |
+| `weapon` | `weapon(id, tap, { key, tag, charge, foot, off?, ready? })`: a weapon tile from `content/weapons.kdl`; `charge` fills its cooldown bar; its kind, `off` and `ready` are classes; no tap, not pressable |
 | `mount-empty` | `emptyMount(key)`: an empty mount, the size of a weapon tile |
 | `line` | `line(text)`: a line of text in a dialog's body |
 | `dialog` | `dialog(title, sub, body, buttons, layout?)`: over the dimmed arena, swallows taps; `layout` `column` (lines) or `row` (tiles) |
@@ -120,6 +120,7 @@ every `paint=` is here and named after its weapon or enemy).
 |---|---|
 | `--ink` | the darkest background, the arena's clear colour and ground bounce, a cooldown bar's track |
 | `--panel` | button, tile and bar fill |
+| `--panel-ready` | a called weapon's tile when it can fire |
 | `--edge` | button, bar and empty-mount border |
 | `--text` | body text |
 | `--dim` | secondary text |
@@ -186,7 +187,7 @@ no unit is a strength, a count or a 0..1 amount.
 
 ## Behaviour words
 
-Weapon words go under a `weapon` in `content/weapons.kdl` and run top to bottom each time its cooldown comes round
+Weapon words go under a `weapon` in `content/weapons.kdl` and run top to bottom each time it fires
 (`src/weapons.ts`). Enemy words and drop words go under an `enemy` in `content/enemies.kdl`: enemy words run every
 step (`src/enemies.ts`), drop words pay out when it dies (`src/rewards.ts`). One word per line; names are unique
 across all three.
@@ -280,7 +281,7 @@ In draw order (later on top). Each is `screens/<name>.kdl` + `.css` + `.ts` (bin
 | Screen | Use |
 |---|---|
 | `title` | the name, how to play, PLAY, your records |
-| `hud` | during a run: hull, wave, points, score; the weapon mounts with their cooldown bars |
+| `hud` | during a run: hull, wave, points, score; the weapon mounts with their cooldown bars (tap a ready one to fire it) |
 | `shop` | after a cleared wave: three weapons to buy (one, then the next wave), your mounts to sell, or move on |
 | `over` | the run is over: its numbers, go again or back to the title (a `dialog`) |
 | `pause` | the run is paused: resume or quit (a `dialog`) |

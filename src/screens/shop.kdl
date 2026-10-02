@@ -6,7 +6,7 @@ prefab "shop" {
         panel class="dialog-scrim"
         text class="shop-title" bind="title"
         text class="shop-points" bind="points"
-        text class="dialog-sub" "BUY ONE WEAPON  ·  IT FIRES BY ITSELF ON ITS OWN COOLDOWN"
+        text class="dialog-sub" "BUY ONE WEAPON  ·  MOUNT 1 FIRES BY ITSELF, THE REST WHEN YOU CALL THEM"
         panel class="shop-row" slot="offer"
         text class="dialog-sub" "YOUR MOUNTS  ·  TAP ONE TO SELL IT"
         panel class="shop-row" slot="mounts"

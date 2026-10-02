@@ -1,7 +1,8 @@
 // HUD bindings: store data in, action handlers out. Nothing else lives here (screen-imports.test.ts).
 import { use } from '../decl/engine';
 import { weaponDef } from '../content';
-import { readiness } from '../game';
+import * as Actions from '../actions';
+import { canFire, isAuto, readiness } from '../game';
 import { game, ui } from '../store';
 import { T } from '../tuning';
 import { emptyMount, screenUi, weapon } from './shared';
@@ -25,8 +26,12 @@ export function drawHud() {
     points: `${run.points} PTS`,
     score: `SCORE ${run.score}`,
   }, {
-    mounts: run.mounts.map((m, i) => m.weapon
-      ? weapon(m.weapon, undefined, { key: `mount${i}`, tag: `${weaponDef(m.weapon).cooldownS}s`, charge: Math.floor(readiness(m) * BAR_STEPS) / BAR_STEPS, foot: m.cooldownS > 0 ? '' : 'READY' })
-      : emptyMount(`mount${i}`)),
+    mounts: run.mounts.map((m, i) => {
+      if (!m.weapon) return emptyMount(`mount${i}`);
+      const tag = `${weaponDef(m.weapon).cooldownS}s`, charge = Math.floor(readiness(m) * BAR_STEPS) / BAR_STEPS;
+      if (isAuto(i)) return weapon(m.weapon, undefined, { key: `mount${i}`, tag, charge, foot: 'AUTO' });
+      const ready = canFire(run, i);
+      return weapon(m.weapon, () => Actions.fireWeapon(i), { key: `mount${i}`, tag, charge, foot: ready ? `READY · PRESS ${i + 1}` : `KEY ${i + 1}`, ready });
+    }),
   }));
 }

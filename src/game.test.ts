@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ENEMIES, WAVES, WEAPONS } from './content';
-import { IDLE, buy, canSell, cantBuy, newGame, nextWave, parseMeta, recordRun, sell, sellPrice, step, waveDef, type GameState } from './game';
+import { IDLE, buy, canFire, canSell, cantBuy, fireWeapon, newGame, nextWave, parseMeta, recordRun, sell, sellPrice, step, waveDef, type GameState } from './game';
 import { T } from './tuning';
 import type { Enemy } from './world';
 
@@ -33,7 +33,7 @@ describe('the fight', () => {
     expect(e.kind).toBe(WAVES[0]!.queue[0]);
     expect(Math.abs(e.x) > T.ARENA_W_U / 2 - 1 || Math.abs(e.y) > T.ARENA_H_U / 2 - 1).toBe(true);
   });
-  it('a mounted weapon fires at the cursor by itself, then waits out its cooldown', () => {
+  it('the weapon in mount 1 fires at the cursor by itself, then waits out its cooldown', () => {
     let s = arena([foe('crawler', -8, 6)]);
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
     expect(s.shots).toHaveLength(1);
@@ -43,21 +43,26 @@ describe('the fight', () => {
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
     expect(s.shots).toHaveLength(1);
   });
-  it('each weapon keeps its own cooldown', () => {
-    const s0 = arena([foe('crawler', -8, 6)], { mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'rail', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
-    const counts: Record<string, number> = {};
-    let s = s0;
-    for (let t = 0; t < 1; t += STEP_S) {
-      s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
-      for (const e of s.events) if (e.type === 'fired' && e.from !== 'foe') counts[e.from.weapon] = (counts[e.from.weapon] ?? 0) + 1;
-    }
-    const fired = (w: string) => counts[w] ?? 0;
-    expect(fired('rail')).toBe(1); // 1.6 s cooldown: once in a second
-    expect(fired('blaster')).toBeGreaterThan(2); // 0.3 s: four times
+  const armed = () => arena([foe('crawler', -8, 6)], { mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'rail', cooldownS: 0 }, { weapon: 'scatter', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
+  it('the other mounts never fire by themselves: they wait, ready, to be called', () => {
+    const s = run(armed(), 2, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
+    expect(s.shots.some((b) => b.from !== 'foe' && b.from.weapon !== 'blaster')).toBe(false);
+    expect(canFire(s, 1)).toBe(true);
+    expect(canFire(s, 0)).toBe(false); // mount 1 is automatic
   });
-  it('weapons hold their fire while the arena is empty', () => {
-    const s = step(arena([]), STEP_S, IDLE);
+  it('calling a ready weapon fires it and starts its own cooldown; called again too soon, nothing happens', () => {
+    let s = fireWeapon(step(armed(), STEP_S, IDLE), 1);
+    expect(s.events).toEqual([{ type: 'fired', from: { weapon: 'rail' } }]);
+    expect(s.mounts[1]!.cooldownS).toBe(WEAPONS.rail!.cooldownS);
+    expect(fireWeapon(s, 1)).toBe(s);
+    s = run(s, WEAPONS.rail!.cooldownS + STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
+    expect(canFire(s, 1)).toBe(true);
+    expect(fireWeapon(s, 3)).toBe(s); // an empty mount
+  });
+  it('a called weapon can be fired into an empty arena (it\'s your call); the automatic one holds its fire', () => {
+    const s = step(arena([], { queue: ['crawler'] , spawnS: 9 , mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'nova', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] }), STEP_S, IDLE);
     expect(s.events.some((e) => e.type === 'fired')).toBe(false);
+    expect(fireWeapon(s, 1).shots.length).toBeGreaterThan(0);
   });
   it('the pilot moves, and the walls stop it', () => {
     const s = run(newGame(1), 10, { move: { x: 1, y: 0 }, aim: { x: 0, y: 0 } });

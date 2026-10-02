@@ -1,8 +1,9 @@
 // Balance sim: `npm run sim [runs] [max_minutes]`. Plays whole runs headless on the pure core with a simple bot and
-// prints how far it gets. The bot backs away from the nearest enemy and aims at it; in the shop it buys the dearest
+// prints how far it gets. The bot backs away from the nearest enemy, aims at it, and calls each other weapon as soon
+// as it's ready (a human picks their moments, so they should do better); in the shop it buys the dearest
 // weapon it can afford (selling the blaster for room when the mounts are full), else moves on. A run that reaches
 // max_minutes stops there.
-import { buy, cantBuy, nextWave, newGame, IDLE, sell, step, type GameState } from '../src/game';
+import { buy, canFire, cantBuy, fireWeapon, nextWave, newGame, IDLE, sell, step, type GameState } from '../src/game';
 import { weaponDef } from '../src/content';
 import { T } from '../src/tuning';
 
@@ -37,6 +38,7 @@ for (let seed = 1; seed <= runs; seed++) {
     if (s.phase === 'shop') { s = shopBot(s); continue; }
     s = step(s, STEP_S, bot(s));
     t += STEP_S;
+    if (s.enemies.length) s.mounts.forEach((_, i) => { if (canFire(s, i)) s = fireWeapon(s, i); });
   }
   waves.push(s.wave); scores.push(s.score);
 }

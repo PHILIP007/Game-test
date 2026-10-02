@@ -15,7 +15,7 @@ export function drawPause() {
   pauseUi.show(dialog(
     'PAUSED',
     `WAVE ${run.wave}  ·  ${mountedCount(run.mounts)} OF ${run.mounts.length} MOUNTS ARMED`,
-    [line('WASD MOVE  ·  MOUSE AIM  ·  YOUR WEAPONS FIRE BY THEMSELVES  ·  ESC RESUME')],
+    [line('WASD MOVE  ·  MOUSE AIM  ·  2 3 4 OR CLICK FIRE A READY WEAPON  ·  ESC RESUME')],
     [btn('RESUME', () => Actions.togglePause(), 'primary'), btn('QUIT', () => Actions.toTitle())],
   ));
 }
