@@ -1,54 +1,59 @@
-// Content kinds: card, enemy, wave. Each is a zod schema handed to loadKdl, so the schema is the type and the only
-// parser; behaviour words attach through `combinators()` with the registry of the module that owns the rule (card
-// words: cards.ts; enemy words: enemies.ts; drop words: rewards.ts).
+// Content kinds: weapon, enemy, wave. Each is a zod schema handed to loadKdl, so the schema is the type and the only
+// parser; behaviour words attach through `combinators()` with the registry of the module that owns the rule (weapon
+// words: weapons.ts; enemy words: enemies.ts; drop words: rewards.ts).
 import { z } from 'zod';
-import { EFFECTS, type Effect } from './cards';
 import { combinators, loadKdl, tunedText } from './content-load';
 import { BEHAVIOURS, type Behaviour } from './enemies';
 import { REWARDS, type Reward } from './rewards';
-import cardsKdl from '../content/cards.kdl?raw';
+import { EFFECTS, type Effect } from './weapons';
 import enemiesKdl from '../content/enemies.kdl?raw';
 import wavesKdl from '../content/waves.kdl?raw';
+import weaponsKdl from '../content/weapons.kdl?raw';
 
 /** A palette token in screens/shared.css :root (`--enemy-crawler`); the shell reads its colour through tokens.ts. */
 const paint = z.string().regex(/^--[\w-]+$/, 'a palette token like "--enemy-crawler"');
 const child = z.strictObject({ name: z.string(), args: z.array(z.unknown()), props: z.strictObject({}) });
 
-// ---------- cards ----------
+// ---------- weapons ----------
 
-/** What a card is for: its frame colour on screen, and nothing else. */
-export const CARD_KINDS = ['attack', 'move', 'power'] as const;
+/** What a weapon is for: its frame colour on screen, and nothing else. */
+export const WEAPON_KINDS = ['gun', 'support'] as const;
 
-export const CardSchema = z.strictObject({
+export const WeaponSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
-  /** Energy to play it. */
-  cost: z.number().int().nonnegative(),
-  kind: z.enum(CARD_KINDS),
+  /** Points to buy it in the shop (0: never on offer). It sells back for SELL_BACK of this. */
+  price: z.number().int().nonnegative(),
+  /** Seconds between shots: how often its words run. The balance lever: big hits come slowly. */
+  'cooldown-s': z.number().positive(),
+  kind: z.enum(WEAPON_KINDS),
   /** Its shots' colour in the arena. */
   paint,
-  /** Copies in the deck a run starts with (0: only found as a reward). */
+  /** Copies mounted when a run starts. */
   starting: z.number().int().nonnegative().default(0),
-  /** The words on the card. `{volley.0}` quotes the first number of its own `volley` word, so the text can't go stale. */
+  /** The words on its tile. `{volley.0}` quotes the first number of its own `volley` word and `{cooldown}` its
+   *  cooldown-s, so the text can't go stale. */
   text: z.string(),
   children: z.array(child),
-}).transform(({ children, text, ...c }, ctx) => {
-  const words = combinators(EFFECTS, 'card word').safeParse(children);
+}).transform(({ children, text, 'cooldown-s': cooldownS, ...w }, ctx) => {
+  const words = combinators(EFFECTS, 'weapon word').safeParse(children);
   if (!words.success) { words.error.issues.forEach((i) => ctx.issues.push({ ...i, input: children, path: ['words', ...i.path] } as never)); return z.NEVER; }
-  const quoted = tunedText(Object.fromEntries(children.map((w) => [w.name, w.args]))).safeParse(text);
+  const quoted = tunedText({ ...Object.fromEntries(children.map((c) => [c.name, c.args])), cooldown: cooldownS }).safeParse(text);
   if (!quoted.success) { quoted.error.issues.forEach((i) => ctx.issues.push({ ...i, input: text, path: ['text'] } as never)); return z.NEVER; }
-  return { ...c, text: quoted.data, effects: words.data as Effect[] };
+  return { ...w, cooldownS, text: quoted.data, effects: words.data as Effect[] };
 });
-export type CardDef = z.output<typeof CardSchema>;
+export type WeaponDef = z.output<typeof WeaponSchema>;
 
-export const CARDS = loadKdl(cardsKdl, { card: CardSchema }).card;
-export const CARD_IDS = Object.keys(CARDS);
-/** The deck a run starts with: each card's `starting` copies, in file order. */
-export const STARTING_DECK = CARD_IDS.flatMap((id) => Array<string>(CARDS[id]!.starting).fill(id));
+export const WEAPONS = loadKdl(weaponsKdl, { weapon: WeaponSchema }).weapon;
+export const WEAPON_IDS = Object.keys(WEAPONS);
+/** What the shop can offer: every weapon with a price. */
+export const SHOP_IDS = WEAPON_IDS.filter((id) => WEAPONS[id]!.price > 0);
+/** The weapons a run starts with: each weapon's `starting` copies, in file order. */
+export const STARTING_WEAPONS = WEAPON_IDS.flatMap((id) => Array<string>(WEAPONS[id]!.starting).fill(id));
 
-export function cardDef(id: string): CardDef {
-  const d = CARDS[id];
-  if (!d) throw new Error(`unknown card "${id}" (known: ${CARD_IDS.join(', ')})`);
+export function weaponDef(id: string): WeaponDef {
+  const d = WEAPONS[id];
+  if (!d) throw new Error(`unknown weapon "${id}" (known: ${WEAPON_IDS.join(', ')})`);
   return d;
 }
 

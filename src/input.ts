@@ -1,6 +1,6 @@
 // The pilot's controls: keys held and where the cursor is. This is per-frame scratch, so it lives here, not in a
-// store; each step the runtime reads it once (`readInput`) and hands it to the core. Card keys and pause call
-// actions directly. Which key does what is the table below.
+// store; each step the runtime reads it once (`readInput`) and hands it to the core. The pause key calls an action
+// directly. Which key does what is the table below.
 import * as Actions from './actions';
 import type { Input, Vec } from './game';
 
@@ -11,8 +11,6 @@ const MOVE: Record<string, Vec> = {
   KeyA: { x: -1, y: 0 }, ArrowLeft: { x: -1, y: 0 },
   KeyD: { x: 1, y: 0 }, ArrowRight: { x: 1, y: 0 },
 };
-/** Card keys: the hand's slots, left to right. */
-const CARD_KEYS = ['Digit1', 'Digit2', 'Digit3', 'Digit4'];
 const PAUSE_KEYS = ['Escape', 'KeyP'];
 
 const held = new Set<string>();
@@ -34,9 +32,7 @@ export function listenInput(project: typeof toWorld) {
   toWorld = project;
   const down = (e: KeyboardEvent) => {
     if (e.repeat) return;
-    const slot = CARD_KEYS.indexOf(e.code);
-    if (slot >= 0) Actions.playCard(slot);
-    else if (PAUSE_KEYS.includes(e.code)) Actions.togglePause();
+    if (PAUSE_KEYS.includes(e.code)) Actions.togglePause();
     else if (!(e.code in MOVE)) return;
     held.add(e.code);
     e.preventDefault();

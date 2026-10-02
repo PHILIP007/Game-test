@@ -91,7 +91,7 @@ export function createScene(el: HTMLElement, w: number, h: number) {
   const foes = new Map<number, Foe>();
   const shotGeo = new THREE.SphereGeometry(1, 10, 8);
   const shotMats = new Map<string, THREE.MeshBasicMaterial>();
-  const shotPaint = (from: ShotSource) => (from === 'blaster' ? '--shot-blaster' : from === 'foe' ? '--shot-foe' : `--card-${from.card}`);
+  const shotPaint = (from: ShotSource) => (from === 'foe' ? '--shot-foe' : `--weapon-${from.weapon}`);
   const shotMat = (paint: string) => { let m = shotMats.get(paint); if (!m) shotMats.set(paint, (m = new THREE.MeshBasicMaterial({ color: token(paint) }))); return m; };
   const shots = new Map<number, THREE.Mesh>();
 
@@ -120,7 +120,6 @@ export function createScene(el: HTMLElement, w: number, h: number) {
       if (ev.type === 'struck') { const f = foes.get(ev.id); if (f) f.flashS = LOOK.FLASH_S; }
       else if (ev.type === 'killed') burst(ev, enemyDef(ev.kind).paint);
       else if (ev.type === 'hurt') shakeS = LOOK.SHAKE_S;
-      else if (ev.type === 'dashed') burst(ev.from, '--card-dash');
       else if (ev.type === 'died') burst(s.player, '--pilot');
     }
   }

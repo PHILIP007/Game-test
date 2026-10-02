@@ -1,7 +1,9 @@
 // Balance sim: `npm run sim [runs] [max_minutes]`. Plays whole runs headless on the pure core with a simple bot and
-// prints how far it gets. The bot backs away from the nearest enemy, aims at it, plays the leftmost card it can pay
-// for once a second, and always takes the first card on offer. A run that reaches max_minutes stops there.
-import { IDLE, newGame, pickReward, playCard, playable, step, type GameState } from '../src/game';
+// prints how far it gets. The bot backs away from the nearest enemy and aims at it; in the shop it buys the dearest
+// weapon it can afford (selling the blaster for room when the mounts are full), else moves on. A run that reaches
+// max_minutes stops there.
+import { buy, cantBuy, nextWave, newGame, IDLE, sell, step, type GameState } from '../src/game';
+import { weaponDef } from '../src/content';
 import { T } from '../src/tuning';
 
 declare const process: { argv: string[] };
@@ -18,18 +20,23 @@ function bot(s: GameState) {
   return { move: { x: away.x - p.x * 0.05, y: away.y - p.y * 0.05 }, aim: { x: near.x, y: near.y } };
 }
 
+function shopBot(s: GameState): GameState {
+  const want = [...s.offer].sort((a, b) => weaponDef(b).price - weaponDef(a).price).find((w) => cantBuy(s, w) !== 'points');
+  if (!want) return nextWave(s);
+  if (cantBuy(s, want) === 'mounts') {
+    const blaster = s.mounts.findIndex((m) => m.weapon === 'blaster'), sold = blaster >= 0 ? sell(s, blaster) : s;
+    return sold !== s && !cantBuy(sold, want) ? buy(sold, want) : nextWave(s);
+  }
+  return buy(s, want);
+}
+
 const waves: number[] = [], scores: number[] = [];
 for (let seed = 1; seed <= runs; seed++) {
-  let s = newGame(seed), t = 0, nextCardS = 1;
+  let s = newGame(seed), t = 0;
   while (s.phase !== 'dead' && t < maxMin * 60) {
-    if (s.phase === 'reward') { s = pickReward(s, s.offer[0]!); continue; }
+    if (s.phase === 'shop') { s = shopBot(s); continue; }
     s = step(s, STEP_S, bot(s));
     t += STEP_S;
-    if (t >= nextCardS) {
-      nextCardS = t + 1;
-      const slot = s.hand.findIndex((_, i) => playable(s, i));
-      if (slot >= 0) s = playCard(s, slot);
-    }
   }
   waves.push(s.wave); scores.push(s.score);
 }

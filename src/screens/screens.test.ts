@@ -7,12 +7,12 @@ import { newGame, type GameState } from '../game';
 import { initialUi, game, ui, type UiState } from '../store';
 import { drawTitle } from './title';
 import { drawHud } from './hud';
-import { drawReward } from './reward';
+import { drawShop } from './shop';
 import { drawOver } from './over';
 import { drawPause } from './pause';
 import { layers } from '../stage';
 
-const drawAll = () => { drawTitle(); drawHud(); drawReward(); drawOver(); drawPause(); };
+const drawAll = () => { drawTitle(); drawHud(); drawShop(); drawOver(); drawPause(); };
 const texts = () => { const out: string[] = []; const walk = (n: { children?: unknown[]; text?: unknown; visible?: boolean }) => { if (n.visible === false) return; if (typeof n.text === 'string') out.push(n.text); (n.children ?? []).forEach((c) => walk(c as never)); }; walk(layers.ui as never); return out; };
 const show = (run: GameState, u: Partial<UiState> = {}) => { game.setState({ run }); ui.setState({ ...initialUi, ...u }); drawAll(); return texts(); };
 
@@ -28,15 +28,16 @@ describe('screens render from the stores', () => {
     expect(t).toContain('BEST 99  ·  FURTHEST WAVE 4  ·  2 RUNS');
     expect(t).not.toContain('WAVE 1');
   });
-  it('hud: wave, score, the hand', () => {
-    const s = { ...newGame(1), score: 42, hand: ['scatter', 'rail', 'dash', 'surge'] };
+  it('hud: wave, points, score, the mounts', () => {
+    const s = { ...newGame(1), points: 70, score: 120 };
     const t = show(s, { screen: 'run' });
-    expect(t).toEqual(expect.arrayContaining(['WAVE 1', 'SCORE 42', 'SCATTER', 'RAIL', 'DASH', 'SURGE', '5 shots in a fan']));
+    expect(t).toEqual(expect.arrayContaining(['WAVE 1', '70 PTS', 'SCORE 120', 'BLASTER', 'One shot at the cursor', 'EMPTY MOUNT']));
     expect(t).not.toContain('DECKFIRE');
   });
-  it('reward', () => {
-    expect(show({ ...newGame(1), phase: 'reward', offer: ['nova', 'patch', 'blink'] }, { screen: 'run' }))
-      .toEqual(expect.arrayContaining(['WAVE 1 CLEARED', 'NOVA', 'PATCH', 'BLINK', 'SKIP']));
+  it('shop: offers with prices, mounts to sell, move on', () => {
+    expect(show({ ...newGame(1), phase: 'shop', points: 60, offer: ['scatter', 'rail', 'medic'] }, { screen: 'run' }))
+      .toEqual(expect.arrayContaining(['WAVE 1 CLEARED', '60 POINTS TO SPEND', 'SCATTER', '60 PTS', 'BUY', 'NOT ENOUGH POINTS', 'REPAIR DRONE', 'LAST WEAPON', 'NEXT WAVE']));
+    expect(texts()).not.toContain('HULL'); // the HUD steps aside for the shop
   });
   it('game over', () => {
     expect(show({ ...newGame(1), phase: 'dead', wave: 5 }, { screen: 'run' })).toContain('YOU FELL ON WAVE 5');

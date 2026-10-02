@@ -1,6 +1,6 @@
 // Every number a rule reads. Units are in the name: world units (U, one unit is about a metre), seconds (S), per
-// second (_S at the end of a rate: U_S is units per second), degrees (DEG). Content (which cards and enemies exist,
-// what they cost and do, what each wave sends) lives in content/*.kdl; look numbers live in screens/shared.css.
+// second (_S at the end of a rate: U_S is units per second). Content (which weapons and enemies exist, what they
+// cost and do, what each wave sends) lives in content/*.kdl; look numbers live in screens/shared.css.
 
 export const T = {
   // ---------- the arena: a rectangle centred on the origin; nothing leaves it ----------
@@ -14,12 +14,8 @@ export const T = {
   /** After a hit, this long untouchable, so one crowd doesn't drain the whole bar in a frame. */
   HURT_GRACE_S: 0.8,
 
-  // ---------- the blaster: always firing at the cursor, so the cards are the decisions ----------
-  BLASTER_COOLDOWN_S: 0.28,
-  /** The blaster under a `rapid` card: this fraction of the normal cooldown. */
-  RAPID_COOLDOWN_SCALE: 0.35,
-  BLASTER_DAMAGE: 1,
-  SHOT_SPEED_U_S: 18,
+  // ---------- weapon fire (each weapon's cooldown and price are in content/weapons.kdl) ----------
+  SHOT_SPEED_U_S: 22,
   /** A `rail` slug: faster than a shot, and it goes through everything it meets. */
   RAIL_SPEED_U_S: 34,
   SHOT_R_U: 0.15,
@@ -34,17 +30,13 @@ export const T = {
   LUNGE_WINDUP_S: 0.55,
   LUNGE_S: 0.45,
 
-  // ---------- energy: what cards cost; it refills on its own ----------
-  ENERGY_MAX: 5,
-  ENERGY_START: 3,
-  ENERGY_PER_S: 0.8,
-
-  // ---------- the deck ----------
-  HAND_SIZE: 4,
-  /** Cards shown after a cleared wave; you take one or skip. */
+  // ---------- mounts and the shop ----------
+  /** Weapons the pilot can carry at once; each fires by itself on its own cooldown. */
+  MOUNTS: 4,
+  /** Weapons on offer in the shop after a cleared wave; you buy one or move on. */
   OFFER_SIZE: 3,
-  /** A `dash` leaves you untouchable this long, so dashing through a crowd is safe. */
-  DASH_GRACE_S: 0.25,
+  /** A sold weapon pays back this fraction of its price (rounded down), so swapping costs something. */
+  SELL_BACK: 0.5,
 
   // ---------- waves ----------
   /** Enemies appear on the arena's edge, this far inside it. */
@@ -52,5 +44,5 @@ export const T = {
   /** Health back at the start of each wave, so a long run isn't lost to chip damage alone. */
   WAVE_HEAL: 1,
   /** After the last wave in content/waves.kdl the list repeats; each lap, enemies have this much more health (0.5 = +50%). */
-  LAP_HP_STEP: 0.5,
+  LAP_HP_STEP: 1.0,
 } as const;

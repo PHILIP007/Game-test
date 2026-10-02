@@ -8,16 +8,26 @@ prefab "btn" {
     }
 }
 
-// A card from content/cards.kdl: card(id, tap, hotkey?, off?) in shared.ts. Its kind (attack, move, power) and
-// `off` become classes.
-prefab "card" {
-    button class="card" bind-class="state" tap="tap" {
-        panel class="card-top" {
-            text class="card-cost" bind="cost"
-            text class="card-name" bind="name"
+// A weapon from content/weapons.kdl: weapon(id, tap, { key, tag, charge, foot, off? }) in shared.ts. Its kind (gun,
+// support) and `off` become classes; with no tap (the HUD) it can't be pressed.
+prefab "weapon" {
+    button class="weapon" bind-class="state" tap="tap" {
+        panel class="weapon-top" {
+            text class="weapon-name" bind="name"
+            text class="weapon-tag" bind="tag"
         }
-        text class="card-text" bind="text"
-        text class="card-hotkey" bind="hotkey"
+        text class="weapon-text" bind="text"
+        panel class="weapon-bar" {
+            meter class="weapon-charge" value=(bind)"charge"
+        }
+        text class="weapon-foot" bind="foot"
+    }
+}
+
+// A mount with nothing in it, the size of a weapon tile: emptyMount(key) in shared.ts.
+prefab "mount-empty" {
+    panel class="mount-empty" {
+        text class="mount-empty-label" "EMPTY MOUNT"
     }
 }
 
@@ -27,7 +37,7 @@ prefab "line" {
 }
 
 // A dialog over the dimmed arena: dialog(title, sub, body, buttons, layout?) in shared.ts. It swallows taps, so
-// nothing behind it can be pressed. `layout` is the body's class: a column of lines, or a `row` of cards.
+// nothing behind it can be pressed. `layout` is the body's class: a column of lines, or a `row` of tiles.
 prefab "dialog" {
     panel class="dialog" {
         panel class="dialog-scrim"

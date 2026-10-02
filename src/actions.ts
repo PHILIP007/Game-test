@@ -1,5 +1,5 @@
 // The one impure boundary for state: every tap and key lands here and reaches the core through a namespace
-// (`Game.playCard`), so the layer shows at the call site. Screens and input call these; they never write a store.
+// (`Game.buy`), so the layer shows at the call site. Screens and input call these; they never write a store.
 import * as Game from './game';
 import { game, ui } from './store';
 
@@ -17,19 +17,22 @@ export function step(dtS: number, input: Game.Input) {
   game.setState(next.phase === 'dead' && run.phase !== 'dead' ? { run: next, meta: Game.recordRun(meta, next) } : { run: next });
 }
 
-export function playCard(slot: number) {
-  const { run } = game.getState();
-  if (ui.getState().paused) return;
-  const next = Game.playCard(run, slot);
-  if (next !== run) game.setState({ run: next });
+/** Buy a weapon on offer in the shop; the next wave starts. */
+export function buy(weapon: string) {
+  game.setState({ run: Game.buy(game.getState().run, weapon) });
 }
 
-/** Take a card from the offer (null: skip it); the next wave starts. */
-export function pickReward(card: string | null) {
-  game.setState({ run: Game.pickReward(game.getState().run, card) });
+/** Sell the weapon in a mount; the shop stays open. */
+export function sell(mount: number) {
+  game.setState({ run: Game.sell(game.getState().run, mount) });
 }
 
-/** Pause or resume, but only mid-fight: the reward and game-over dialogs already hold the run still. */
+/** Leave the shop without buying; the next wave starts. */
+export function nextWave() {
+  game.setState({ run: Game.nextWave(game.getState().run) });
+}
+
+/** Pause or resume, but only mid-fight: the shop and game-over dialogs already hold the run still. */
 export function togglePause() {
   const { screen, paused } = ui.getState();
   if (screen === 'run' && (paused || game.getState().run.phase === 'fight')) ui.setState({ paused: !paused });

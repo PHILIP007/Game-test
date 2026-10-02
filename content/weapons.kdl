@@ -1,0 +1,65 @@
+// The weapons. The pilot carries up to 4 (MOUNTS in src/tuning.ts); every mounted weapon fires at the cursor by
+// itself whenever its cooldown comes round, and holds its fire while the arena is empty. The shop after each wave
+// offers 3 of the weapons with a price; a sold weapon pays back half its price (SELL_BACK).
+//   weapon "id" name="Shown name" price=<points> cooldown-s=<seconds between shots> kind="gun|support"
+//          paint="--token" starting=<copies mounted at the start> text="..." {
+//       weapon words, run top to bottom each time it fires
+//   }
+// `kind` picks the tile's frame colour (screens/shared.css). `paint` is its shots' colour, a palette token in
+// src/screens/shared.css :root. In `text`, {volley.0} quotes the first number of the weapon's own `volley` word, and
+// {cooldown} its cooldown-s.
+// Weapon words (src/weapons.ts, catalog ## Behaviour words); aim is towards the cursor:
+//   volley n spread_deg damage    n shots fanned across spread_deg (n 1: one straight shot)
+//   rail damage                   one fast slug that goes through everything
+//   nova n damage                 n shots in a ring all round you
+//   shield s                      a bubble for s seconds: nothing touches you
+//   mend n                        n health back
+// Balance by cooldown: a gun's damage per second is its shots' damage, all told, divided by its cooldown-s.
+
+// ---------- what you start with ----------
+
+weapon "blaster" name="Blaster" price=0 cooldown-s=0.25 kind="gun" paint="--weapon-blaster" starting=1 text="One shot at the cursor" {
+    volley 1 0 1
+}
+
+// ---------- guns from the shop ----------
+
+// Cheap, a little better than the blaster: the first buy after wave 1.
+weapon "twin" name="Twin" price=50 cooldown-s=0.4 kind="gun" paint="--weapon-twin" text="{volley.0} shots side by side" {
+    volley 2 10 1
+}
+
+// Clears swarms close up; slow between fans.
+weapon "scatter" name="Scatter" price=60 cooldown-s=1.1 kind="gun" paint="--weapon-scatter" text="{volley.0} shots in a fan" {
+    volley 5 40 1
+}
+
+// Kills a line of crawlers, and spitters from afar.
+weapon "rail" name="Rail" price=80 cooldown-s=1.6 kind="gun" paint="--weapon-rail" text="A slug through everything: {rail.0} damage" {
+    rail 4
+}
+
+// The blaster, much faster.
+weapon "repeater" name="Repeater" price=100 cooldown-s=0.12 kind="gun" paint="--weapon-repeater" text="A stream of single shots" {
+    volley 1 0 1
+}
+
+// Covers your back: when they come from every side.
+weapon "nova" name="Nova" price=120 cooldown-s=2.5 kind="gun" paint="--weapon-nova" text="{nova.0} shots all round you" {
+    nova 16 2
+}
+
+// The heavy hitter: a wide wall of strong shots, slowly.
+weapon "barrage" name="Barrage" price=150 cooldown-s=2.2 kind="gun" paint="--weapon-barrage" text="{volley.0} heavy shots in a wide fan" {
+    volley 9 80 2
+}
+
+// ---------- support from the shop ----------
+
+weapon "barrier" name="Barrier" price=100 cooldown-s=9 kind="support" paint="--weapon-barrier" text="Untouchable for {shield.0}s, every {cooldown}s" {
+    shield 2
+}
+
+weapon "medic" name="Repair Drone" price=110 cooldown-s=12 kind="support" paint="--weapon-medic" text="+{mend.0} hull, every {cooldown}s" {
+    mend 1
+}

@@ -2,17 +2,17 @@
 // here touches the renderer, the store, the DOM or storage (src/core-purity.test.ts holds that line). Each transition
 // leaves `events` describing what just happened, and the shell animates from those.
 //
-// A run: waves of enemies come in from the arena's edge (content/waves.kdl). The blaster fires at the cursor on its
-// own; cards from your hand (content/cards.kdl) cost energy, which refills over time. A played card goes to the
-// discard and the next card takes its slot. Clear a wave and you pick a card to add to your deck.
+// A run: waves of enemies come in from the arena's edge (content/waves.kdl). Every weapon mounted on the pilot
+// (content/weapons.kdl) fires at the cursor by itself, each on its own cooldown. Kills pay points; clear a wave and
+// the shop offers weapons to buy with them, and buys back the ones you carry.
 import { z } from 'zod';
-import { allCards, drawCards } from './cards';
-import { CARD_IDS, STARTING_DECK, WAVES, cardDef, enemyDef } from './content';
+import { SHOP_IDS, STARTING_WEAPONS, WAVES, enemyDef, weaponDef } from './content';
 import { pick, rand, shuffle, type Rng } from './rng';
 import { T } from './tuning';
-import { clampToArena, dist, fire, inArena, toward, unit, type Enemy, type GameEvent, type GameState, type Shot, type Vec } from './world';
+import { freeMount, mountedCount } from './weapons';
+import { clampToArena, dist, fire, inArena, toward, unit, type Enemy, type GameEvent, type GameState, type Mount, type Shot, type Vec } from './world';
 
-export type { GameState, GameEvent, Enemy, Shot, Vec } from './world';
+export type { GameState, GameEvent, Enemy, Mount, Shot, Vec } from './world';
 
 /** What the pilot asks for this step: a move direction (length up to 1) and the world point the cursor is over. */
 export type Input = { move: Vec; aim: Vec };
@@ -22,27 +22,25 @@ export const IDLE: Input = { move: { x: 0, y: 0 }, aim: { x: 1, y: 0 } };
 export const waveDef = (wave: number) => ({ def: WAVES[(wave - 1) % WAVES.length]!, lap: Math.floor((wave - 1) / WAVES.length) });
 
 export function newGame(seed: number): GameState {
-  const rng: Rng = { seed };
+  const mounts: Mount[] = Array.from({ length: T.MOUNTS }, (_, i) => ({ weapon: STARTING_WEAPONS[i] ?? '', cooldownS: 0 }));
   const s: GameState = {
-    seed: 0, phase: 'fight', wave: 0, queue: [], spawnS: 0,
-    player: { x: 0, y: 0, hp: T.PLAYER_HP, energy: T.ENERGY_START, aim: { x: 1, y: 0 }, graceS: 0, shieldS: 0, rapidS: 0, cooldownS: 0 },
-    enemies: [], shots: [],
-    deck: shuffle(rng, STARTING_DECK), hand: Array<string>(T.HAND_SIZE).fill(''), discard: [], offer: [],
-    score: 0, kills: 0, nextId: 1, events: [],
+    seed, phase: 'fight', wave: 0, queue: [], spawnS: 0,
+    player: { x: 0, y: 0, hp: T.PLAYER_HP, aim: { x: 1, y: 0 }, graceS: 0, shieldS: 0 },
+    enemies: [], shots: [], mounts, offer: [],
+    points: 0, score: 0, kills: 0, nextId: 1, events: [],
   };
-  return startWave({ ...s, seed: rng.seed }, 1);
+  return startWave(s, 1);
 }
 
-/** Wave n begins: every card back in the deck, shuffled, a fresh hand, a little health back, the arena empty. */
+/** Wave n begins: a little health back, the arena empty, every weapon ready. */
 function startWave(s: GameState, wave: number): GameState {
-  const rng: Rng = { seed: s.seed }, { def } = waveDef(wave);
-  const deck = shuffle(rng, allCards(s));
+  const { def } = waveDef(wave);
   const hp = wave === 1 ? s.player.hp : Math.min(T.PLAYER_HP, s.player.hp + T.WAVE_HEAL);
-  return drawCards({
-    ...s, seed: rng.seed, phase: 'fight', wave, queue: def.queue, spawnS: def.gapS,
-    player: { ...s.player, hp, energy: Math.max(s.player.energy, T.ENERGY_START) },
-    enemies: [], shots: [], deck, hand: s.hand.map(() => ''), discard: [], offer: [],
-  });
+  return {
+    ...s, phase: 'fight', wave, queue: def.queue, spawnS: def.gapS,
+    player: { ...s.player, hp, graceS: 0, shieldS: 0 },
+    enemies: [], shots: [], offer: [], mounts: s.mounts.map((m) => ({ ...m, cooldownS: 0 })),
+  };
 }
 
 // ---------- a step of the fight ----------
@@ -52,12 +50,13 @@ export function step(s: GameState, dtS: number, input: Input): GameState {
   if (s.phase !== 'fight') return s;
   let n: GameState = { ...s, events: [] };
   n = movePilot(n, dtS, input);
+  n = fireMounts(n, dtS);
   n = spawn(n, dtS);
   n = actEnemies(n, dtS);
   n = moveShots(n, dtS);
   n = collide(n);
   if (n.player.hp <= 0) return { ...n, phase: 'dead', player: { ...n.player, hp: 0 }, events: [...n.events, { type: 'died' }] };
-  if (!n.queue.length && !n.enemies.length) return offerCards(n);
+  if (!n.queue.length && !n.enemies.length) return openShop(n);
   return n;
 }
 
@@ -65,16 +64,24 @@ function movePilot(s: GameState, dtS: number, { move, aim }: Input): GameState {
   const p = s.player, m = Math.hypot(move.x, move.y) > 1 ? unit(move) : move;
   const at = clampToArena({ x: p.x + m.x * T.PLAYER_SPEED_U_S * dtS, y: p.y + m.y * T.PLAYER_SPEED_U_S * dtS }, T.PLAYER_R_U);
   const down = (v: number) => Math.max(0, v - dtS);
-  const player = {
-    ...p, ...at,
-    aim: dist(at, aim) > 0.05 ? toward(at, aim) : p.aim,
-    energy: Math.min(T.ENERGY_MAX, p.energy + T.ENERGY_PER_S * dtS),
-    graceS: down(p.graceS), shieldS: down(p.shieldS), rapidS: down(p.rapidS), cooldownS: p.cooldownS - dtS,
-  };
-  const n = { ...s, player };
-  if (player.cooldownS > 0) return n;
-  const cooldownS = T.BLASTER_COOLDOWN_S * (player.rapidS > 0 ? T.RAPID_COOLDOWN_SCALE : 1);
-  return fire({ ...n, player: { ...player, cooldownS } }, 'blaster', [{ dir: player.aim, speed: T.SHOT_SPEED_U_S, damage: T.BLASTER_DAMAGE }]);
+  return { ...s, player: { ...p, ...at, aim: dist(at, aim) > 0.05 ? toward(at, aim) : p.aim, graceS: down(p.graceS), shieldS: down(p.shieldS) } };
+}
+
+/**
+ * Every mounted weapon counts its cooldown down and, when it comes round, runs its words and starts again. With no
+ * enemy on the field a ready weapon holds its fire (so a shield isn't spent on an empty arena).
+ */
+function fireMounts(s: GameState, dtS: number): GameState {
+  let n = s;
+  const mounts = s.mounts.map((m): Mount => {
+    if (!m.weapon) return m;
+    const cooldownS = Math.max(0, m.cooldownS - dtS);
+    if (cooldownS > 0 || !s.enemies.length) return { ...m, cooldownS };
+    const d = weaponDef(m.weapon);
+    n = d.effects.reduce((acc, fx) => fx(acc, m.weapon), n);
+    return { ...m, cooldownS: d.cooldownS };
+  });
+  return { ...n, mounts };
 }
 
 /** The next enemy of the wave's queue, on a random spot of the arena's edge. */
@@ -160,41 +167,52 @@ function hurt(s: GameState, damage: number): GameState {
   return { ...s, player: { ...s.player, hp: s.player.hp - damage, graceS: T.HURT_GRACE_S }, events: [...s.events, { type: 'hurt', damage }] };
 }
 
-/** The wave is cleared: shots vanish and a few cards are on offer. */
-function offerCards(s: GameState): GameState {
+/** The wave is cleared: shots vanish and the shop opens with a few weapons on offer. */
+function openShop(s: GameState): GameState {
   const rng: Rng = { seed: s.seed };
-  const offer = shuffle(rng, CARD_IDS).slice(0, T.OFFER_SIZE);
-  return { ...s, seed: rng.seed, phase: 'reward', shots: [], offer, events: [...s.events, { type: 'cleared', wave: s.wave }] };
+  const offer = shuffle(rng, SHOP_IDS).slice(0, T.OFFER_SIZE);
+  return { ...s, seed: rng.seed, phase: 'shop', shots: [], offer, events: [...s.events, { type: 'cleared', wave: s.wave }] };
 }
 
-// ---------- cards ----------
+// ---------- the shop ----------
 
-/** Whether the card in `slot` can be played now. */
-export const playable = (s: GameState, slot: number) => {
-  const id = s.hand[slot];
-  return s.phase === 'fight' && !!id && s.player.energy >= cardDef(id).cost;
-};
+/** How far round a mount's cooldown is: 0 just fired, 1 ready (an empty mount: 0). */
+export const readiness = (m: Mount) => (m.weapon ? 1 - m.cooldownS / weaponDef(m.weapon).cooldownS : 0);
 
-/** Play the card in `slot`: pay its energy, draw its replacement, then run its words. Not playable: no-op. */
-export function playCard(s: GameState, slot: number): GameState {
-  if (!playable(s, slot)) return s;
-  const id = s.hand[slot]!, d = cardDef(id);
-  const hand = s.hand.slice();
-  hand[slot] = '';
-  let n: GameState = {
-    ...s, hand, discard: [...s.discard, id],
-    player: { ...s.player, energy: s.player.energy - d.cost },
-    events: [...s.events, { type: 'played', card: id, slot }],
-  };
-  n = drawCards(n);
-  return d.effects.reduce((acc, fx) => fx(acc, id), n);
+/** What a weapon pays back when sold. */
+export const sellPrice = (weapon: string) => Math.floor(weaponDef(weapon).price * T.SELL_BACK);
+
+/** Why a weapon on offer can't be bought right now, or null when it can. */
+export function cantBuy(s: GameState, weapon: string): 'points' | 'mounts' | null {
+  if (s.points < weaponDef(weapon).price) return 'points';
+  if (freeMount(s.mounts) < 0) return 'mounts';
+  return null;
 }
 
-/** Take a card from the offer into the deck (or skip with null), and the next wave begins. Not on offer: no-op. */
-export function pickReward(s: GameState, card: string | null): GameState {
-  if (s.phase !== 'reward' || (card !== null && !s.offer.includes(card))) return s;
-  const n = card === null ? s : { ...s, discard: [...s.discard, card] };
-  return startWave({ ...n, events: [] }, s.wave + 1);
+/** Whether the weapon in `mount` can be sold: in the shop, and never the last one you carry. */
+export const canSell = (s: GameState, mount: number) => s.phase === 'shop' && !!s.mounts[mount]?.weapon && mountedCount(s.mounts) > 1;
+
+/** Buy a weapon on offer into the first free mount, and the next wave begins. Not on offer or not affordable: no-op. */
+export function buy(s: GameState, weapon: string): GameState {
+  if (s.phase !== 'shop' || !s.offer.includes(weapon) || cantBuy(s, weapon)) return s;
+  const at = freeMount(s.mounts), mounts = s.mounts.slice();
+  mounts[at] = { weapon, cooldownS: 0 };
+  const n = { ...s, mounts, points: s.points - weaponDef(weapon).price };
+  return startWave({ ...n, events: [{ type: 'bought', weapon, mount: at }] }, s.wave + 1);
+}
+
+/** Sell the weapon in `mount` for SELL_BACK of its price, freeing the mount. The shop stays open. Not sellable: no-op. */
+export function sell(s: GameState, mount: number): GameState {
+  if (!canSell(s, mount)) return s;
+  const weapon = s.mounts[mount]!.weapon, points = sellPrice(weapon), mounts = s.mounts.slice();
+  mounts[mount] = { weapon: '', cooldownS: 0 };
+  return { ...s, mounts, points: s.points + points, events: [{ type: 'sold', weapon, mount, points }] };
+}
+
+/** Leave the shop without buying: the next wave begins, your points kept for later. */
+export function nextWave(s: GameState): GameState {
+  if (s.phase !== 'shop') return s;
+  return startWave({ ...s, events: [] }, s.wave + 1);
 }
 
 // ---------- meta: what outlives a run (saved by the store; zod checks a save on load, saves are untrusted) ----------

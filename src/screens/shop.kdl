@@ -1,0 +1,15 @@
+// The shop after a cleared wave, over the dimmed arena: the title and your points; the weapons on offer, one to buy
+// (buying starts the next wave); your mounts, any of which you can sell first to free a mount or raise points; and a
+// button to move on without buying. Styled with the shared dialog classes (shared.css) and shop.css; bound in shop.ts.
+prefab "shop" {
+    panel class="dialog" {
+        panel class="dialog-scrim"
+        text class="shop-title" bind="title"
+        text class="shop-points" bind="points"
+        text class="dialog-sub" "BUY ONE WEAPON  ·  IT FIRES BY ITSELF ON ITS OWN COOLDOWN"
+        panel class="shop-row" slot="offer"
+        text class="dialog-sub" "YOUR MOUNTS  ·  TAP ONE TO SELL IT"
+        panel class="shop-row" slot="mounts"
+        panel class="dialog-buttons" slot="buttons"
+    }
+}

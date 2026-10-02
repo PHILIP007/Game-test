@@ -12,9 +12,9 @@ Homes:
 | Shared prefabs | `src/screens/shared.kdl`, styled in `src/screens/shared.css` |
 | Palette (UI and 3D) | `:root` of `src/screens/shared.css`, read by the shell through `src/tokens.ts` |
 | Look numbers (light, camera, exposure) | `--look-*` tokens in the `:root` of `src/screens/shared.css`, read by the shell through `src/view/look.ts` |
-| Behaviour words | card words: `EFFECTS` in `src/cards.ts`; enemy words: `BEHAVIOURS` in `src/enemies.ts`; drop words: `REWARDS` in `src/rewards.ts` |
+| Behaviour words | weapon words: `EFFECTS` in `src/weapons.ts`; enemy words: `BEHAVIOURS` in `src/enemies.ts`; drop words: `REWARDS` in `src/rewards.ts` |
 | Content kinds | zod schemas in `src/content.ts`, data in `content/*.kdl` |
-| Card kinds, enemy shapes | `CARD_KINDS`, `SHAPES` in `src/content.ts` |
+| Weapon kinds, enemy shapes | `WEAPON_KINDS`, `SHAPES` in `src/content.ts` |
 | Screens and their stacking | `src/runtime.ts` (import order = draw order) |
 | Modelling words | `models/kit.py` (the only module model scripts import) |
 
@@ -106,51 +106,49 @@ Build them with the binding builders exported from `screens/shared.ts`.
 | Prefab | Use |
 |---|---|
 | `btn` | `btn(label, tap, state?)`; state `primary` / `off` |
-| `card` | `card(id, tap, { key, hotkey?, off? })`: a card from `content/cards.kdl`; its kind and `off` are classes |
+| `weapon` | `weapon(id, tap, { key, tag, charge, foot, off? })`: a weapon tile from `content/weapons.kdl`; `charge` fills its cooldown bar; its kind and `off` are classes; no tap, not pressable |
+| `mount-empty` | `emptyMount(key)`: an empty mount, the size of a weapon tile |
 | `line` | `line(text)`: a line of text in a dialog's body |
-| `dialog` | `dialog(title, sub, body, buttons, layout?)`: over the dimmed arena, swallows taps; `layout` `column` (lines) or `row` (cards) |
+| `dialog` | `dialog(title, sub, body, buttons, layout?)`: over the dimmed arena, swallows taps; `layout` `column` (lines) or `row` (tiles) |
 
 ## Palette
 
-UI colours, the arena's colours, one `--card-<id>` per card and one `--enemy-<id>` per enemy (a guard test checks
-every `paint=` is here and named after its card or enemy).
+UI colours, the arena's colours, one `--weapon-<id>` per weapon and one `--enemy-<id>` per enemy (a guard test checks
+every `paint=` is here and named after its weapon or enemy).
 
 | Token | Use |
 |---|---|
-| `--ink` | the darkest background, the arena's clear colour and ground bounce |
-| `--panel` | button, card and bar fill |
-| `--edge` | button and bar border |
+| `--ink` | the darkest background, the arena's clear colour and ground bounce, a cooldown bar's track |
+| `--panel` | button, tile and bar fill |
+| `--edge` | button, bar and empty-mount border |
 | `--text` | body text |
 | `--dim` | secondary text |
 | `--accent` | primary UI accent: primary buttons, hover, the wave, dialog titles |
 | `--scrim` | the dark behind a dialog and the title |
 | `--hull` | the hull (health) bar |
-| `--energy` | the energy number and bar, card costs |
+| `--points` | points: the HUD's count, the shop's, prices |
 | `--pop` | overshoot easing |
 | `--title-font` | headings, numbers and button labels |
 | `--body-font` | body text |
-| `--kind-attack` | an attack card's frame |
-| `--kind-move` | a move card's frame |
-| `--kind-power` | a power card's frame |
+| `--kind-gun` | a gun's tile frame and cooldown bar |
+| `--kind-support` | a support weapon's tile frame and cooldown bar |
 | `--floor` | the arena's floor |
 | `--grid` | the floor's 1 u grid lines |
 | `--wall` | the arena's walls (they glow in it) |
 | `--light` | the key and sky light's hue |
-| `--pilot` | the pilot's dart |
+| `--pilot` | the pilot's dart, and its burst when it dies |
 | `--shield` | the shield bubble |
 | `--reticle` | the aim ring under the cursor |
-| `--shot-blaster` | the blaster's shots |
 | `--shot-foe` | enemies' shots |
-| `--card-scatter` | Scatter's shots |
-| `--card-rail` | Rail's slug |
-| `--card-dash` | Dash (and its burst where you leave) |
-| `--card-surge` | Surge |
-| `--card-nova` | Nova's ring |
-| `--card-barrage` | Barrage's shots |
-| `--card-barrier` | Barrier |
-| `--card-overclock` | Overclock |
-| `--card-blink` | Blink |
-| `--card-patch` | Patch |
+| `--weapon-blaster` | the blaster's shots |
+| `--weapon-twin` | the twin's shots |
+| `--weapon-scatter` | the scatter's shots |
+| `--weapon-rail` | the rail's slug |
+| `--weapon-repeater` | the repeater's shots |
+| `--weapon-nova` | the nova's ring |
+| `--weapon-barrage` | the barrage's shots |
+| `--weapon-barrier` | the barrier (support) |
+| `--weapon-medic` | the repair drone (support) |
 | `--enemy-crawler` | the crawler, and its kill burst |
 | `--enemy-spitter` | the spitter |
 | `--enemy-charger` | the charger |
@@ -173,7 +171,7 @@ no unit is a strength, a count or a 0..1 amount.
 | `--look-camera-fov-deg` | field of view |
 | `--look-camera-tilt-rad` | camera tilt off straight down |
 | `--look-camera-margin` | room round the arena (1: edge to edge); the camera backs off to fit it |
-| `--look-camera-lift-u` | how far below the arena's centre the camera looks, so the arena clears the hand |
+| `--look-camera-lift-u` | how far below the arena's centre the camera looks, so the arena clears the mounts |
 | `--look-flash-s` | how long a struck enemy shows white |
 | `--look-flash-glow` | how bright that flash is |
 | `--look-burst-bits` | bits flung out when an enemy dies |
@@ -188,46 +186,42 @@ no unit is a strength, a count or a 0..1 amount.
 
 ## Behaviour words
 
-Card words go under a `card` in `content/cards.kdl` and run top to bottom when it's played (`src/cards.ts`). Enemy
-words and drop words go under an `enemy` in `content/enemies.kdl`: enemy words run every step (`src/enemies.ts`),
-drop words pay out when it dies (`src/rewards.ts`). One word per line; names are unique across all three.
+Weapon words go under a `weapon` in `content/weapons.kdl` and run top to bottom each time its cooldown comes round
+(`src/weapons.ts`). Enemy words and drop words go under an `enemy` in `content/enemies.kdl`: enemy words run every
+step (`src/enemies.ts`), drop words pay out when it dies (`src/rewards.ts`). One word per line; names are unique
+across all three.
 
 | Word | Use |
 |---|---|
-| `volley` | card: `volley n spread_deg damage`: n shots fanned across spread_deg along your aim |
-| `rail` | card: `rail damage`: one fast slug that goes through everything |
-| `nova` | card: `nova n damage`: n shots in a ring all round you |
-| `dash` | card: `dash dist_u`: jump along your aim, untouchable for a moment |
-| `shield` | card: `shield s`: a bubble for s seconds, nothing touches you |
-| `rapid` | card: `rapid s`: the blaster fires much faster for s seconds |
-| `charge` | card: `charge n`: n energy now |
-| `mend` | card: `mend n`: n health back |
+| `volley` | weapon: `volley n spread_deg damage`: n shots fanned across spread_deg along your aim (n 1: one straight shot) |
+| `rail` | weapon: `rail damage`: one fast slug that goes through everything |
+| `nova` | weapon: `nova n damage`: n shots in a ring all round you |
+| `shield` | weapon: `shield s`: a bubble for s seconds, nothing touches you |
+| `mend` | weapon: `mend n`: n health back |
 | `chase` | enemy: `chase speed_u_s`: walk straight at the pilot |
 | `orbit` | enemy: `orbit range_u speed_u_s`: keep about range_u away and circle |
 | `lunge` | enemy: `lunge every_s speed_u_s`: stop, shake, then dash at the pilot |
 | `shoot` | enemy: `shoot every_s speed_u_s`: one shot at the pilot |
 | `spray` | enemy: `spray n every_s speed_u_s`: n shots in a ring |
-| `score` | drop: `score n`: n points |
-| `energy` | drop: `energy n`: n energy |
+| `points` | drop: `points n`: n points to spend in the shop (and towards the score) |
 | `heal` | drop: `heal n`: n health back |
 
 ## Content kinds
 
 | Kind | Use |
 |---|---|
-| `card` | `card "id" name= cost= kind= paint="--card-<id>" starting= text= { card words }`, in `content/cards.kdl`; `{word.i}` in `text` quotes the card's own numbers |
+| `weapon` | `weapon "id" name= price= cooldown-s= kind= paint="--weapon-<id>" starting= text= { weapon words }`, in `content/weapons.kdl`; `{word.i}` and `{cooldown}` in `text` quote its own numbers; price 0 is never on offer |
 | `enemy` | `enemy "id" name= hp= r= touch= paint="--enemy-<id>" shape= { enemy words, drop words }`, in `content/enemies.kdl` |
 | `wave` | `wave "id" gap-s= { <enemy id> <count> ... }`, in `content/waves.kdl`, in order; the list repeats, a lap harder |
 
-## Card kinds
+## Weapon kinds
 
-The `kind=` of a card: its frame colour (`--kind-<kind>`), nothing else.
+The `kind=` of a weapon: its tile's frame and cooldown bar colour (`--kind-<kind>`), nothing else.
 
 | Kind | Use |
 |---|---|
-| `attack` | cards that fire |
-| `move` | cards that move you |
-| `power` | everything else: energy, health, shields, the blaster |
+| `gun` | weapons that fire shots |
+| `support` | weapons that shield or repair you |
 
 ## Enemy shapes
 
@@ -286,7 +280,7 @@ In draw order (later on top). Each is `screens/<name>.kdl` + `.css` + `.ts` (bin
 | Screen | Use |
 |---|---|
 | `title` | the name, how to play, PLAY, your records |
-| `hud` | during a run: hull, wave, score; energy, the hand of cards, the piles |
-| `reward` | after a cleared wave: the cards on offer, or skip (a `dialog`) |
+| `hud` | during a run: hull, wave, points, score; the weapon mounts with their cooldown bars |
+| `shop` | after a cleared wave: three weapons to buy (one, then the next wave), your mounts to sell, or move on |
 | `over` | the run is over: its numbers, go again or back to the title (a `dialog`) |
 | `pause` | the run is paused: resume or quit (a `dialog`) |

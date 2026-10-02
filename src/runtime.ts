@@ -12,7 +12,7 @@ import { tickScreens } from './screens/shared';
 // Screens stack in import order (each screenUi attaches to layers.ui as its module loads): later draws on top.
 import { drawTitle } from './screens/title';
 import { drawHud } from './screens/hud';
-import { drawReward } from './screens/reward';
+import { drawShop } from './screens/shop';
 import { drawOver } from './screens/over';
 import { drawPause } from './screens/pause';
 
@@ -22,7 +22,7 @@ export let scene: Scene | null = null;
 export function drawScreens() {
   drawTitle();
   drawHud();
-  drawReward();
+  drawShop();
   drawOver();
   drawPause();
 }

@@ -1,6 +1,6 @@
 // Pause bindings: store data in, action handlers out. Nothing else lives here (screen-imports.test.ts).
 import * as Actions from '../actions';
-import { allCards } from '../cards';
+import { mountedCount } from '../weapons';
 import { game, ui } from '../store';
 import { btn, dialog, line, screenUi } from './shared';
 import pauseKdl from './pause.kdl?raw';
@@ -14,8 +14,8 @@ export function drawPause() {
   if (screen !== 'run' || !paused || run.phase !== 'fight') return pauseUi.show(null);
   pauseUi.show(dialog(
     'PAUSED',
-    `WAVE ${run.wave}  ·  ${allCards(run).length} CARDS IN YOUR DECK`,
-    [line('WASD MOVE  ·  MOUSE AIM  ·  1-4 PLAY A CARD  ·  ESC RESUME')],
+    `WAVE ${run.wave}  ·  ${mountedCount(run.mounts)} OF ${run.mounts.length} MOUNTS ARMED`,
+    [line('WASD MOVE  ·  MOUSE AIM  ·  YOUR WEAPONS FIRE BY THEMSELVES  ·  ESC RESUME')],
     [btn('RESUME', () => Actions.togglePause(), 'primary'), btn('QUIT', () => Actions.toTitle())],
   ));
 }

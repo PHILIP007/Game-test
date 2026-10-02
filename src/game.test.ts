@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { CARDS, ENEMIES, STARTING_DECK, WAVES } from './content';
-import { IDLE, newGame, parseMeta, pickReward, playCard, recordRun, step, waveDef, type GameState } from './game';
+import { ENEMIES, WAVES, WEAPONS } from './content';
+import { IDLE, buy, canSell, cantBuy, newGame, nextWave, parseMeta, recordRun, sell, sellPrice, step, waveDef, type GameState } from './game';
 import { T } from './tuning';
 import type { Enemy } from './world';
 
@@ -15,12 +15,12 @@ describe('a new run', () => {
   it('is the same for the same seed', () => {
     expect(newGame(7)).toEqual(newGame(7));
   });
-  it('starts on wave 1 with a full hand drawn from the starting deck', () => {
+  it('starts on wave 1 with the blaster mounted, the other mounts empty, no points', () => {
     const s = newGame(3);
     expect(s.wave).toBe(1);
     expect(s.phase).toBe('fight');
-    expect(s.hand).toHaveLength(T.HAND_SIZE);
-    expect([...s.hand, ...s.deck].sort()).toEqual([...STARTING_DECK].sort());
+    expect(s.mounts.map((m) => m.weapon)).toEqual(['blaster', ...Array(T.MOUNTS - 1).fill('')]);
+    expect(s.points).toBe(0);
     expect(s.queue).toEqual(WAVES[0]!.queue);
   });
 });
@@ -33,11 +33,31 @@ describe('the fight', () => {
     expect(e.kind).toBe(WAVES[0]!.queue[0]);
     expect(Math.abs(e.x) > T.ARENA_W_U / 2 - 1 || Math.abs(e.y) > T.ARENA_H_U / 2 - 1).toBe(true);
   });
-  it('the blaster fires at the cursor on its own', () => {
-    const s = step(newGame(1), STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
+  it('a mounted weapon fires at the cursor by itself, then waits out its cooldown', () => {
+    let s = arena([foe('crawler', -8, 6)]);
+    s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
     expect(s.shots).toHaveLength(1);
     expect(s.shots[0]!.v.y).toBeGreaterThan(0);
-    expect(s.events).toContainEqual({ type: 'fired', from: 'blaster' });
+    expect(s.events).toContainEqual({ type: 'fired', from: { weapon: 'blaster' } });
+    expect(s.mounts[0]!.cooldownS).toBeCloseTo(WEAPONS.blaster!.cooldownS);
+    s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: 5 } });
+    expect(s.shots).toHaveLength(1);
+  });
+  it('each weapon keeps its own cooldown', () => {
+    const s0 = arena([foe('crawler', -8, 6)], { mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'rail', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
+    const counts: Record<string, number> = {};
+    let s = s0;
+    for (let t = 0; t < 1; t += STEP_S) {
+      s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
+      for (const e of s.events) if (e.type === 'fired' && e.from !== 'foe') counts[e.from.weapon] = (counts[e.from.weapon] ?? 0) + 1;
+    }
+    const fired = (w: string) => counts[w] ?? 0;
+    expect(fired('rail')).toBe(1); // 1.6 s cooldown: once in a second
+    expect(fired('blaster')).toBeGreaterThan(2); // 0.3 s: four times
+  });
+  it('weapons hold their fire while the arena is empty', () => {
+    const s = step(arena([]), STEP_S, IDLE);
+    expect(s.events.some((e) => e.type === 'fired')).toBe(false);
   });
   it('the pilot moves, and the walls stop it', () => {
     const s = run(newGame(1), 10, { move: { x: 1, y: 0 }, aim: { x: 0, y: 0 } });
@@ -49,10 +69,11 @@ describe('the fight', () => {
     expect(s.player.hp).toBe(T.PLAYER_HP - ENEMIES.crawler!.touch);
     expect(s.player.graceS).toBeGreaterThan(0);
   });
-  it('shots kill, and kills pay out their drop words', () => {
+  it('shots kill, and kills pay points (which count towards the score)', () => {
     let s = arena([foe('crawler', 4, 0, { hp: 1 }), foe('crawler', -8, 6, { id: 901 })]);
     s = run(s, 0.5, { move: { x: 0, y: 0 }, aim: { x: 4, y: 0 } });
     expect(s.kills).toBe(1);
+    expect(s.points).toBe(10);
     expect(s.score).toBe(10);
   });
   it('a charger winds up, then lunges', () => {
@@ -73,10 +94,11 @@ describe('the fight', () => {
     s = step(s, STEP_S, { move: { x: 0, y: 0 }, aim: { x: 0, y: -5 } });
     expect(s.shots.filter((b) => b.from === 'foe').length).toBeGreaterThan(5);
   });
-  it('a cleared wave offers cards; dying ends the run', () => {
+  it('a cleared wave opens the shop with priced weapons; dying ends the run', () => {
     const cleared = step(arena([]), STEP_S, IDLE);
-    expect(cleared.phase).toBe('reward');
+    expect(cleared.phase).toBe('shop');
     expect(cleared.offer).toHaveLength(T.OFFER_SIZE);
+    expect(cleared.offer.every((w) => WEAPONS[w]!.price > 0)).toBe(true);
     const dead = step(arena([foe('crawler', 0.2, 0)], { player: { ...newGame(1).player, hp: 1 } }), STEP_S, IDLE);
     expect(dead.phase).toBe('dead');
     expect(dead.events.at(-1)).toEqual({ type: 'died' });
@@ -84,52 +106,46 @@ describe('the fight', () => {
   });
 });
 
-describe('cards', () => {
-  const holding = (card: string, energy: number = T.ENERGY_MAX) => {
-    const s = arena([]);
-    return { ...s, hand: [card, ...s.hand.slice(1)], player: { ...s.player, energy } };
-  };
-  it('playing a card pays its cost, discards it and draws the next into its slot', () => {
-    const s = holding('scatter');
-    const top = s.deck[0];
-    const n = playCard(s, 0);
-    expect(n.player.energy).toBe(T.ENERGY_MAX - CARDS.scatter!.cost);
-    expect(n.discard.at(-1)).toBe('scatter');
-    expect(n.hand[0]).toBe(top);
-    expect(n.shots).toHaveLength(5);
-  });
-  it('without the energy, or with nothing in the slot, it is a no-op (same reference)', () => {
-    const s = holding('rail', 1);
-    expect(playCard(s, 0)).toBe(s);
-    const empty = { ...s, hand: ['', ...s.hand.slice(1)] };
-    expect(playCard(empty, 0)).toBe(empty);
-  });
-  it('a rail goes through every enemy in a line', () => {
-    let s = playCard({ ...holding('rail'), enemies: [foe('crawler', 3, 0, { hp: 3 }), foe('crawler', 6, 0, { id: 901, hp: 3 })], player: { ...holding('rail').player, aim: { x: 1, y: 0 } } }, 0);
-    s = run(s, 0.4, { move: { x: 0, y: 0 }, aim: { x: 10, y: 0 } });
-    expect(s.kills).toBe(2);
-  });
-  it('dash jumps along the aim and leaves the pilot untouchable', () => {
-    const s = playCard({ ...holding('dash'), player: { ...holding('dash').player, aim: { x: 0, y: 1 } } }, 0);
-    expect(s.player.y).toBeCloseTo(4);
-    expect(s.player.graceS).toBeGreaterThan(0);
-  });
-  it('when the draw pile runs out the discard is shuffled back in', () => {
-    const s = { ...holding('surge', 0), deck: [], discard: ['rail', 'dash'] };
-    const n = playCard(s, 0);
-    expect(n.events).toContainEqual({ type: 'shuffled' });
-    expect(n.hand[0]).not.toBe('');
-  });
-  it('a picked reward joins the deck and the next wave starts with every card shuffled back', () => {
-    const cleared = step(arena([]), STEP_S, IDLE), card = cleared.offer[0]!;
-    const next = pickReward(cleared, card);
+describe('the shop', () => {
+  const shop = (over: Partial<GameState> = {}): GameState => ({ ...step(arena([]), STEP_S, IDLE), offer: ['scatter', 'rail', 'nova'], ...over });
+  it('buying spends points, mounts the weapon in the first free mount, and starts the next wave', () => {
+    const s = shop({ points: 100 }), next = buy(s, 'rail');
+    expect(next.points).toBe(100 - WEAPONS.rail!.price);
+    expect(next.mounts[1]!.weapon).toBe('rail');
     expect(next.wave).toBe(2);
     expect(next.phase).toBe('fight');
-    expect([...next.deck, ...next.hand].sort()).toEqual([...STARTING_DECK, card].sort());
-    expect(pickReward(cleared, 'not-on-offer')).toBe(cleared);
+    expect(next.events).toEqual([{ type: 'bought', weapon: 'rail', mount: 1 }]);
   });
-  it('card text quotes its own words', () => {
-    expect(CARDS.scatter!.text).toBe('5 shots in a fan');
+  it('without the points, without a free mount, or off the offer, it is a no-op (same reference)', () => {
+    const poor = shop({ points: 10 });
+    expect(cantBuy(poor, 'rail')).toBe('points');
+    expect(buy(poor, 'rail')).toBe(poor);
+    const full = shop({ points: 999, mounts: Array.from({ length: T.MOUNTS }, () => ({ weapon: 'blaster', cooldownS: 0 })) });
+    expect(cantBuy(full, 'rail')).toBe('mounts');
+    expect(buy(full, 'rail')).toBe(full);
+    expect(buy(shop({ points: 999 }), 'barrage')).toEqual(shop({ points: 999 }));
+  });
+  it('selling pays back part of the price and frees the mount; the shop stays open', () => {
+    const s = shop({ points: 0, mounts: [{ weapon: 'blaster', cooldownS: 0 }, { weapon: 'nova', cooldownS: 0 }, { weapon: '', cooldownS: 0 }, { weapon: '', cooldownS: 0 }] });
+    const n = sell(s, 1);
+    expect(n.points).toBe(sellPrice('nova'));
+    expect(sellPrice('nova')).toBe(Math.floor(WEAPONS.nova!.price * T.SELL_BACK));
+    expect(n.mounts[1]!.weapon).toBe('');
+    expect(n.phase).toBe('shop');
+  });
+  it('the last weapon you carry can\'t be sold', () => {
+    const s = shop();
+    expect(canSell(s, 0)).toBe(false);
+    expect(sell(s, 0)).toBe(s);
+  });
+  it('moving on keeps your points', () => {
+    const n = nextWave(shop({ points: 70 }));
+    expect(n.wave).toBe(2);
+    expect(n.points).toBe(70);
+  });
+  it('weapon text quotes its own words and cooldown', () => {
+    expect(WEAPONS.scatter!.text).toBe('5 shots in a fan');
+    expect(WEAPONS.barrier!.text).toBe('Untouchable for 2s, every 9s');
   });
 });
 

@@ -1,35 +1,32 @@
 // HUD bindings: store data in, action handlers out. Nothing else lives here (screen-imports.test.ts).
-import * as Actions from '../actions';
 import { use } from '../decl/engine';
-import { playable } from '../game';
+import { weaponDef } from '../content';
+import { readiness } from '../game';
 import { game, ui } from '../store';
 import { T } from '../tuning';
-import { card, screenUi } from './shared';
+import { emptyMount, screenUi, weapon } from './shared';
 import hudKdl from './hud.kdl?raw';
 import hudCss from './hud.css?raw';
 
 export const hudUi = screenUi(hudKdl, hudCss);
 if (import.meta.hot) import.meta.hot.accept(['./hud.kdl?raw', './hud.css?raw'], ([k, c]) => hudUi.reload(k?.default, c?.default));
 
-/** The energy bar moves in steps this fine, so the HUD redraws a few times a second rather than every frame. */
-const BAR_STEPS = 40;
+/** The cooldown bars move in steps this fine, so the HUD redraws a handful of times a second, not every frame. */
+const BAR_STEPS = 10;
 
 export function drawHud() {
   const { screen } = ui.getState(), { run } = game.getState();
-  if (screen !== 'run') return hudUi.show(null);
+  if (screen !== 'run' || run.phase === 'shop') return hudUi.show(null); // the shop shows the points and mounts itself
   const p = run.player;
   hudUi.show(use('hud', {
     hull: p.hp / T.PLAYER_HP,
     hullText: `${p.hp}/${T.PLAYER_HP}`,
     wave: `WAVE ${run.wave}`,
+    points: `${run.points} PTS`,
     score: `SCORE ${run.score}`,
-    energy: String(Math.floor(p.energy)),
-    charge: Math.round((p.energy / T.ENERGY_MAX) * BAR_STEPS) / BAR_STEPS,
-    deck: `DECK ${run.deck.length}`,
-    discard: `DISCARD ${run.discard.length}`,
   }, {
-    hand: run.hand.flatMap((id, slot) => id
-      ? [card(id, () => Actions.playCard(slot), { key: `slot${slot}`, hotkey: String(slot + 1), off: !playable(run, slot) })]
-      : []),
+    mounts: run.mounts.map((m, i) => m.weapon
+      ? weapon(m.weapon, undefined, { key: `mount${i}`, tag: `${weaponDef(m.weapon).cooldownS}s`, charge: Math.floor(readiness(m) * BAR_STEPS) / BAR_STEPS, foot: m.cooldownS > 0 ? '' : 'READY' })
+      : emptyMount(`mount${i}`)),
   }));
 }

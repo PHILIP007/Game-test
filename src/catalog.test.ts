@@ -9,10 +9,10 @@ import runtimeTs from './runtime.ts?raw';
 import contentLoadTs from './content-load.ts?raw';
 import kitPy from '../models/kit.py?raw';
 import { PROPS } from './decl/css';
-import { EFFECTS } from './cards';
-import { CARD_KINDS, SHAPES } from './content';
+import { SHAPES, WEAPON_KINDS } from './content';
 import { BEHAVIOURS } from './enemies';
 import { REWARDS } from './rewards';
+import { EFFECTS } from './weapons';
 import { TOKENS } from './tokens';
 import { LOOK_KEYS, lookToken } from './view/look';
 import './screens/shared'; // registers the game's properties
@@ -40,7 +40,7 @@ describe('the catalog matches the code', () => {
     const names = [...Object.keys(EFFECTS), ...Object.keys(BEHAVIOURS), ...Object.keys(REWARDS)];
     expect(names.length).toBe(new Set(names).size);
   });
-  it('card kinds', () => same('Card kinds', [...CARD_KINDS]));
+  it('weapon kinds', () => same('Weapon kinds', [...WEAPON_KINDS]));
   it('enemy shapes', () => same('Enemy shapes', [...SHAPES]));
   it('content kinds', () => same('Content kinds', all(contentTs, /loadKdl\(\w+, \{ ([^}]+) \}/g).flatMap((kinds) => kinds.split(',').map((k) => k.split(':')[0]!.trim()))));
   it('content helpers', () => same('Content helpers', all(contentLoadTs, /^export function (\w+)/gm)));

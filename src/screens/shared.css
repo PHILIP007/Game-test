@@ -11,15 +11,14 @@
   --accent: #ffcf4a;
   --scrim: #03040a;
   --hull: #ff5470;
-  --energy: #4ad8ff;
+  --points: #ffcf4a;
   --pop: cubic-bezier(.3, 1.7, .5, 1);
   --title-font: "Trebuchet MS", Arial, sans-serif;
   --body-font: Arial, sans-serif;
 
-  /* Card frames, one per card kind (content/cards.kdl `kind=`). */
-  --kind-attack: #ff8a3d;
-  --kind-move: #4ad8ff;
-  --kind-power: #b98aff;
+  /* Weapon tile frames, one per weapon kind (content/weapons.kdl `kind=`). */
+  --kind-gun: #ff8a3d;
+  --kind-support: #6ff0ff;
 
   /* The arena (tokens.ts): floor, grid lines, walls, the light's hue. */
   --floor: #0e1322;
@@ -31,21 +30,19 @@
   --shield: #6ff0ff;
   --reticle: #ffcf4a;
 
-  /* Shots: the blaster's and the enemies'. A card's shots take its own paint, below. */
-  --shot-blaster: #fff3b0;
+  /* Enemies' shots. The pilot's shots take their weapon's paint, below. */
   --shot-foe: #ff3d6e;
 
-  /* One --card-<id> per card in content/cards.kdl: its shots' colour. */
-  --card-scatter: #ffae42;
-  --card-rail: #8af7ff;
-  --card-dash: #4ad8ff;
-  --card-surge: #c6a4ff;
-  --card-nova: #ff7af0;
-  --card-barrage: #ff6a3d;
-  --card-barrier: #6ff0ff;
-  --card-overclock: #fff06a;
-  --card-blink: #7dc8ff;
-  --card-patch: #7dffa8;
+  /* One --weapon-<id> per weapon in content/weapons.kdl: its shots' colour. */
+  --weapon-blaster: #fff3b0;
+  --weapon-twin: #c6f06a;
+  --weapon-scatter: #ffae42;
+  --weapon-rail: #8af7ff;
+  --weapon-repeater: #fff06a;
+  --weapon-nova: #ff7af0;
+  --weapon-barrage: #ff6a3d;
+  --weapon-barrier: #6ff0ff;
+  --weapon-medic: #7dffa8;
 
   /* One --enemy-<id> per enemy in content/enemies.kdl. */
   --enemy-crawler: #ff4d4d;
@@ -65,7 +62,7 @@
   /* How brightly enemies glow in their own colour (0: not at all, 1: flat colour). */
   --look-glow: 0.35;
   /* Camera: field of view, tilt off straight down, how much room round the arena (1: edge to edge), and how far
-     below the arena's centre it looks, so the arena sits above the hand of cards. */
+     below the arena's centre it looks, so the arena sits above the weapon mounts. */
   --look-camera-fov-deg: 38;
   --look-camera-tilt-rad: 0.32;
   --look-camera-margin: 1.34;
@@ -101,27 +98,34 @@ button.primary { border-color: var(--accent) }
 button.off { opacity: .45 }
 .shared-btn-label { font-family: var(--title-font); font-size: 16px; letter-spacing: 3px; font-color: var(--text) }
 
-/* A card: cost in the corner, name, what it does, and its key. The frame's colour says its kind; `off` when you
-   can't pay for it. */
-button.card {
-  width: 128px; height: 76px; padding: 5px 8px; gap: 2px; align-items: stretch; justify-content: flex-start;
-  border-width: 2px; transition: scale .1s ease-out, opacity .15s, translate .15s ease-out;
+/* A weapon tile: name and a tag (its cooldown, or its price in the shop), what it does, a bar that fills as its
+   cooldown comes round, and a foot line (buy, sell). The frame's colour says its kind; `off` when it can't be
+   bought or sold. */
+button.weapon {
+  width: 138px; height: 80px; padding: 5px 8px; gap: 3px; align-items: stretch; justify-content: flex-start;
+  border-width: 2px; transition: scale .1s ease-out, opacity .15s;
 }
-button.card:hover { translate: 0 -6px }
-.card.attack { border-color: var(--kind-attack) }
-.card.move { border-color: var(--kind-move) }
-.card.power { border-color: var(--kind-power) }
-.card.off { opacity: .4 }
-.card-top { flex-direction: row; align-items: center; gap: 6px }
-.card-cost { font-family: var(--title-font); font-size: 16px; font-color: var(--energy) }
-.card-name { font-family: var(--title-font); font-size: 13px; letter-spacing: 1px }
-.card-text { font-size: 11px; line-height: 13px; font-color: var(--dim); text-wrap: wrap; width: 100%; flex-grow: 1 }
-.card-hotkey { font-size: 10px; font-color: var(--dim); text-align: right; width: 100% }
+.weapon.gun { border-color: var(--kind-gun) }
+.weapon.support { border-color: var(--kind-support) }
+.weapon.off { opacity: .4 }
+.weapon-top { flex-direction: row; align-items: center; justify-content: space-between }
+.weapon-name { font-family: var(--title-font); font-size: 13px; letter-spacing: 1px }
+.weapon-tag { font-family: var(--title-font); font-size: 12px; font-color: var(--points) }
+.weapon-text { font-size: 11px; line-height: 13px; font-color: var(--dim); text-wrap: wrap; width: 100%; flex-grow: 1 }
+.weapon-bar { width: 100%; height: 4px; background-color: var(--ink) }
+.weapon-charge { width: 100%; height: 100%; tint: var(--text) }
+.weapon.gun .weapon-charge { tint: var(--kind-gun) }
+.weapon.support .weapon-charge { tint: var(--kind-support) }
+.weapon-foot { font-size: 10px; letter-spacing: 1px; font-color: var(--text); text-align: right; width: 100% }
+
+/* An empty mount: the size of a weapon tile, dashed out. */
+.mount-empty { width: 138px; height: 80px; align-items: center; justify-content: center; border-color: var(--edge); border-width: 1px; opacity: .6 }
+.mount-empty-label { font-size: 11px; letter-spacing: 2px; font-color: var(--dim) }
 
 /* A line of text in a dialog's body. */
 .shared-line { font-size: 14px; letter-spacing: 1px; font-color: var(--dim); text-align: center }
 
-/* A dialog over the arena: the dimmed arena behind, a title, a line, its body (cards, lines) and its buttons. */
+/* A dialog over the arena: the dimmed arena behind, a title, a line, its body (tiles, lines) and its buttons. */
 .dialog { width: 100%; height: 100%; align-items: center; justify-content: center; gap: 12px; pointer-events: auto }
 .dialog-scrim { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: var(--scrim); opacity: .72 }
 .dialog-title { font-family: var(--title-font); font-size: 30px; letter-spacing: 8px; font-color: var(--accent); animation: dialog-in .45s var(--pop) }

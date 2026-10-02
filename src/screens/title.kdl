@@ -5,12 +5,12 @@ prefab "title" {
         panel class="title-scrim"
         panel class="title-top" {
             text class="title-name" "DECKFIRE"
-            text class="title-tag" "A DECK-BUILDING ARENA SHOOTER"
+            text class="title-tag" "AN ARENA SHOOTER OF MOUNTED GUNS"
         }
         panel class="title-how" {
-            text class="title-line" "WASD OR ARROWS TO MOVE  ·  THE MOUSE AIMS  ·  YOUR BLASTER FIRES ON ITS OWN"
-            text class="title-line" "1 2 3 4 OR CLICK A CARD TO PLAY IT  ·  CARDS COST ENERGY, WHICH REFILLS"
-            text class="title-line" "CLEAR A WAVE, ADD A CARD TO YOUR DECK  ·  ESC PAUSES"
+            text class="title-line" "WASD OR ARROWS TO MOVE  ·  THE MOUSE AIMS  ·  ESC PAUSES"
+            text class="title-line" "EVERY WEAPON YOU MOUNT FIRES BY ITSELF, EACH ON ITS OWN COOLDOWN"
+            text class="title-line" "KILLS PAY POINTS  ·  AFTER EACH WAVE, BUY A WEAPON OR SELL ONE IN THE SHOP"
         }
         panel class="title-bottom" {
             panel class="title-buttons" slot="buttons"

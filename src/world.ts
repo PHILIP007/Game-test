@@ -1,5 +1,5 @@
 // The shape of a run, and the small helpers every rule module shares (moving, aiming, firing). Pure: plain data in,
-// plain data out. game.ts runs the rules; cards.ts, enemies.ts and rewards.ts own the behaviour words content uses.
+// plain data out. game.ts runs the rules; weapons.ts, enemies.ts and rewards.ts own the behaviour words content uses.
 import { T } from './tuning';
 
 export type Vec = { x: number; y: number };
@@ -7,18 +7,16 @@ export type Vec = { x: number; y: number };
 export type Player = {
   x: number; y: number;
   hp: number;
-  energy: number;
-  /** Where the pilot is aiming: a unit vector, set from the cursor every step. Cards fire along it. */
+  /** Where the pilot is aiming: a unit vector, set from the cursor every step. Weapons fire along it. */
   aim: Vec;
-  /** Seconds left untouchable (after a hit, a dash, a shield). */
+  /** Seconds left untouchable (after a hit, or under a shield). */
   graceS: number;
-  /** Seconds left of a `shield` card: drawn as a bubble, and untouchable meanwhile. */
+  /** Seconds left of a `shield`: drawn as a bubble, and untouchable meanwhile. */
   shieldS: number;
-  /** Seconds left of a `rapid` card: the blaster fires faster. */
-  rapidS: number;
-  /** Seconds until the blaster fires again. */
-  cooldownS: number;
 };
+
+/** A weapon slot on the pilot: the weapon's id (`''` when empty) and seconds until it fires again. */
+export type Mount = { weapon: string; cooldownS: number };
 
 /** What an enemy is doing: walking its behaviour words, or a charger's windup and lunge. */
 export type Mode = 'walk' | 'windup' | 'lunge';
@@ -38,8 +36,8 @@ export type Enemy = {
   spin: number;
 };
 
-/** Who fired a shot: the blaster, a card (its id), or an enemy. Its paint follows from this. */
-export type ShotSource = 'blaster' | 'foe' | { card: string };
+/** Who fired a shot: one of the pilot's weapons (its id), or an enemy. Its paint follows from this. */
+export type ShotSource = 'foe' | { weapon: string };
 
 export type Shot = {
   id: number;
@@ -56,19 +54,18 @@ export type Shot = {
 
 export type GameEvent =
   | { type: 'fired'; from: ShotSource }
-  | { type: 'played'; card: string; slot: number }
-  | { type: 'shuffled' }
+  | { type: 'bought'; weapon: string; mount: number }
+  | { type: 'sold'; weapon: string; mount: number; points: number }
   | { type: 'spawned'; id: number; kind: string }
   | { type: 'struck'; id: number; damage: number }
   | { type: 'killed'; id: number; kind: string; x: number; y: number }
   | { type: 'hurt'; damage: number }
   | { type: 'windup'; id: number }
-  | { type: 'dashed'; from: Vec; to: Vec }
   | { type: 'cleared'; wave: number }
   | { type: 'died' };
 
-/** fight: the wave is on. reward: the wave is cleared and a card is on offer. dead: the run is over. */
-export type Phase = 'fight' | 'reward' | 'dead';
+/** fight: the wave is on. shop: the wave is cleared and weapons are on offer. dead: the run is over. */
+export type Phase = 'fight' | 'shop' | 'dead';
 
 export type GameState = {
   seed: number;
@@ -82,12 +79,13 @@ export type GameState = {
   player: Player;
   enemies: Enemy[];
   shots: Shot[];
-  /** Card ids: the draw pile (next on top = index 0), the hand by slot, the discard pile. */
-  deck: string[];
-  hand: string[];
-  discard: string[];
-  /** Card ids on offer after a cleared wave. */
+  /** The pilot's weapon slots, MOUNTS of them, left to right. */
+  mounts: Mount[];
+  /** Weapon ids on offer in the shop after a cleared wave. */
   offer: string[];
+  /** Points to spend in the shop: kills pay them. */
+  points: number;
+  /** Every point earned this run, spent or not: the run's score. */
   score: number;
   kills: number;
   nextId: number;
